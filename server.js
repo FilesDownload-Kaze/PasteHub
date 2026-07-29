@@ -97,8 +97,8 @@ app.post("/create", async (req, res) => {
         .insert(pasteData);
 
     if (error) {
-        console.log(error);
-        return res.status(500).send("Failed to save paste");
+        console.log("SUPABASE INSERT ERROR:", error);
+        return res.status(500).send(error.message);
     }
 
     res.redirect("/paste/" + id);

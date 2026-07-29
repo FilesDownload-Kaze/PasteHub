@@ -40,22 +40,30 @@ app.get("/", (req, res) => {
 });
 
 // Create Paste
-pastes.push({
-    id,
-    title: req.body.title || "Untitled",
-    content: req.body.content,
-    created: new Date().toISOString(),
-    updated: new Date().toISOString(),
-    views: 0,
-    editKey: generateEditKey(),
-    history: [
-        {
-            title: req.body.title || "Untitled",
-            content: req.body.content,
-            editedAt: new Date().toISOString()
-        }
-    ]
-});
+// Create Paste
+app.post("/create", (req, res) => {
+
+    const pastes = loadPastes();
+
+    const id = nanoid(8);
+
+    pastes.push({
+        id,
+        title: req.body.title || "Untitled",
+        content: req.body.content,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString(),
+        views: 0,
+        editKey: generateEditKey(),
+        history: [
+            {
+                title: req.body.title || "Untitled",
+                content: req.body.content,
+                editedAt: new Date().toISOString()
+            }
+        ]
+    });
+
     savePastes(pastes);
 
     res.redirect("/paste/" + id);

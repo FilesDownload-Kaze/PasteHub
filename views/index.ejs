@@ -1,34 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PasteHub</title>
 
-    <link rel="stylesheet" href="/style.css">
+<title>PasteHub</title>
+
+<link rel="stylesheet" href="/style.css">
+
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>🚀 PasteHub</h1>
+<h1>PasteHub</h1>
 
-    <form action="/create" method="POST">
+<a href="/create">
+<button>Create New Paste</button>
+</a>
 
-        <input
-            type="text"
-            name="title"
-            placeholder="Paste Title"
-        >
+<h2>Saved Pastes</h2>
 
-        <textarea
-            name="content"
-            placeholder="Write or paste your text here..."
-        ></textarea>
+<% if (pastes.length === 0) { %>
 
-        <button>Create Paste</button>
+<p>No pastes yet.</p>
 
-    </form>
+<% } %>
+
+
+<% pastes.forEach(paste => { %>
+
+<div class="paste-box">
+
+<h3>
+<a href="/paste/<%= paste.id %>">
+<%= paste.title %>
+</a>
+</h3>
+
+<p>
+👁️ Views: <%= paste.views %>
+</p>
+
+<p>
+📅 <%= new Date(paste.created).toLocaleString() %>
+</p>
+
+<a href="/edit/<%= paste.id %>?key=<%= paste.editKey %>">
+<button>
+✏️ Edit
+</button>
+</a>
+
+</div>
+
+<br>
+
+<% }) %>
+
 
 </div>
 

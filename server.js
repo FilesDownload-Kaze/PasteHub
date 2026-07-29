@@ -161,6 +161,17 @@ await supabase
 <button>✏️ Edit Paste</button>
 </a>
 
+<br><br>
+
+<form method="POST" action="/delete/${paste.id}?key=${paste.editKey}"
+onsubmit="return confirm('Delete this paste?');">
+
+<button style="background:red;color:white;">
+🗑️ Delete Paste
+</button>
+
+</form>
+
 </div>
 
 </body>
@@ -315,5 +326,35 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
+});
+
+// Delete Paste
+app.post("/delete/:id", async (req, res) => {
+
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
+
+    if (error || !paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    if (req.query.key !== paste.editKey) {
+        return res.status(403).send("Invalid edit key");
+    }
+
+    const { error: deleteError } = await supabase
+        .from("pastes")
+        .delete()
+        .eq("id", paste.id);
+
+    if (deleteError) {
+        console.log(deleteError);
+        return res.status(500).send("Failed to delete paste");
+    }
+
+    res.redirect("/");
 });
          

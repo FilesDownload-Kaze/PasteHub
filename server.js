@@ -36,10 +36,20 @@ function generateEditKey() {
 
 // Home
 app.get("/", (req, res) => {
-    res.render("index");
+
+    const pastes = loadPastes();
+
+    res.render("index", {
+        pastes
+    });
+
 });
 
-// Create Paste
+// Create Page
+app.get("/create", (req, res) => {
+    res.render("create");
+});
+
 // Create Paste
 app.post("/create", (req, res) => {
 

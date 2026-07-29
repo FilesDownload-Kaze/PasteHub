@@ -98,18 +98,24 @@ app.post("/create", async (req, res) => {
 });
 
 // View Paste
-app.get("/paste/:id", (req, res) => {
+app.get("/paste/:id", async (req, res) => {
 
-    const pastes = loadPastes();
+    const { data: paste, error } = await supabase
+    .from("pastes")
+    .select("*")
+    .eq("id", req.params.id)
+    .single();
 
-    const paste = pastes.find(p => p.id === req.params.id);
+if (error || !paste) {
+    return res.status(404).send("Paste not found");
+}
 
-    if (!paste) {
-        return res.status(404).send("Paste not found");
-    }
+paste.views++;
 
-    paste.views++;
-    savePastes(pastes);
+await supabase
+    .from("pastes")
+    .update({ views: paste.views })
+    .eq("id", paste.id);
     
     res.send(`
 <!DOCTYPE html>

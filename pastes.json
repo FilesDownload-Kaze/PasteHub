@@ -1,1 +1,15 @@
-[]
+{
+  "id": "61i9lSG6",
+  "title": "Test",
+  "content": "Hello World",
+  "created": "2026-07-30T10:00:00Z",
+  "updated": "2026-07-30T10:00:00Z",
+  "views": 0,
+  "editKey": "9fa3f2d4d0b44d4f",
+  "history": [
+    {
+      "content": "Hello World",
+      "editedAt": "2026-07-30T10:00:00Z"
+    }
+  ]
+}

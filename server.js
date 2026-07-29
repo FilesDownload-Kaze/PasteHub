@@ -147,3 +147,61 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
 });
+
+// Edit Page
+app.get("/edit/:id", (req, res) => {
+
+    const pastes = loadPastes();
+
+    const paste = pastes.find(p => p.id === req.params.id);
+
+    if (!paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    if (req.query.key !== paste.editKey) {
+        return res.status(403).send("Invalid edit key");
+    }
+
+    res.send(`
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Edit Paste</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Edit Paste</h1>
+
+<form method="POST">
+
+<input
+name="title"
+value="${paste.title}"
+>
+
+<textarea
+name="content"
+>${paste.content}</textarea>
+
+<button>Save Changes</button>
+
+</form>
+
+</div>
+
+</body>
+
+</html>
+    `);
+
+});

@@ -147,3 +147,90 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
 });
+
+// Edit Page
+app.get("/edit/:id", (req, res) => {
+
+    const pastes = loadPastes();
+
+    const paste = pastes.find(p => p.id === req.params.id);
+
+    if (!paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    if (req.query.key !== paste.editKey) {
+        return res.status(403).send("Invalid edit key");
+    }
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Paste</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="container">
+
+<h1>Edit Paste</h1>
+
+<form method="POST" action="/edit/${paste.id}?key=${paste.editKey}">
+
+<input
+type="text"
+name="title"
+value="${paste.title}"
+placeholder="Title"
+>
+
+<textarea
+name="content"
+rows="15"
+>${paste.content}</textarea>
+
+<br><br>
+
+<button type="submit">💾 Save Changes</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
+    `);
+
+});
+
+// Save Edit
+app.post("/edit/:id", (req, res) => {
+
+    const pastes = loadPastes();
+
+    const paste = pastes.find(p => p.id === req.params.id);
+
+    if (!paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    if (req.query.key !== paste.editKey) {
+        return res.status(403).send("Invalid edit key");
+    }
+
+    paste.history.push({
+        title: paste.title,
+        content: paste.content,
+        editedAt: new Date().toISOString()
+    });
+
+    paste.title = req.body.title || "Untitled";
+    paste.content = req.body.content;
+    paste.updated = new Date().toISOString();
+
+    savePastes(pastes);
+
+    res.redirect("/paste/" + paste.id);
+
+});

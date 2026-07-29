@@ -145,14 +145,6 @@ app.get("/raw/:id", (req, res) => {
 
 });
 
-// 404
-app.use((req, res) => {
-    res.status(404).send("404 Not Found");
-});
-
-app.listen(PORT, () => {
-    console.log(`PasteHub running on port ${PORT}`);
-});
 
 // Edit Page
 app.get("/edit/:id", (req, res) => {
@@ -239,4 +231,15 @@ app.post("/edit/:id", (req, res) => {
 
     res.redirect("/paste/" + paste.id);
 
+});
+
+
+// 404 (PINAKA LAST)
+app.use((req, res) => {
+    res.status(404).send("404 Not Found");
+});
+
+
+app.listen(PORT, () => {
+    console.log(`PasteHub running on port ${PORT}`);
 });

@@ -318,16 +318,6 @@ app.get("/test-supabase", async (req, res) => {
 
 });
 
-// 404 (PINAKA LAST)
-app.use((req, res) => {
-    res.status(404).send("404 Not Found");
-});
-
-
-app.listen(PORT, () => {
-    console.log(`PasteHub running on port ${PORT}`);
-});
-
 // Delete Paste
 app.post("/delete/:id", async (req, res) => {
 
@@ -357,4 +347,13 @@ app.post("/delete/:id", async (req, res) => {
 
     res.redirect("/");
 });
-         
+
+// 404 (PINAKA LAST)
+app.use((req, res) => {
+    res.status(404).send("404 Not Found");
+});
+
+
+app.listen(PORT, () => {
+    console.log(`PasteHub running on port ${PORT}`);
+});

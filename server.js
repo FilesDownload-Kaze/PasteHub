@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -27,35 +28,12 @@ function savePastes(data) {
     fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
 
+// Home
 app.get("/", (req, res) => {
     res.render("index");
-    
-        <h1>PasteHub</h1>
-
-        <form method="POST" action="/create">
-
-            <input
-                name="title"
-                placeholder="Title"
-            />
-
-            <br><br>
-
-            <textarea
-                name="content"
-                rows="15"
-                cols="80"
-                placeholder="Write here..."
-            ></textarea>
-
-            <br><br>
-
-            <button>Create Paste</button>
-
-        </form>
-    `);
 });
 
+// Create Paste
 app.post("/create", (req, res) => {
 
     const pastes = loadPastes();
@@ -75,43 +53,71 @@ app.post("/create", (req, res) => {
 
 });
 
+// View Paste
 app.get("/paste/:id", (req, res) => {
 
     const pastes = loadPastes();
 
-    const paste = pastes.find(x => x.id === req.params.id);
+    const paste = pastes.find(p => p.id === req.params.id);
 
-    if (!paste)
+    if (!paste) {
         return res.status(404).send("Paste not found");
+    }
 
     res.send(`
-        <h1>${paste.title}</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<title>${paste.title}</title>
 
-        <pre>${paste.content}</pre>
+<link rel="stylesheet" href="/style.css">
 
-        <hr>
+</head>
 
-        <a href="/raw/${paste.id}">
-            RAW
-        </a>
+<body>
+
+<div class="container">
+
+<h1>${paste.title}</h1>
+
+<textarea readonly>${paste.content}</textarea>
+
+<br><br>
+
+<a href="/raw/${paste.id}">
+<button>View RAW</button>
+</a>
+
+</div>
+
+</body>
+
+</html>
     `);
 
 });
 
+// Raw
 app.get("/raw/:id", (req, res) => {
 
     const pastes = loadPastes();
 
-    const paste = pastes.find(x => x.id === req.params.id);
+    const paste = pastes.find(p => p.id === req.params.id);
 
-    if (!paste)
+    if (!paste) {
         return res.status(404).send("Paste not found");
+    }
 
     res.type("text/plain");
     res.send(paste.content);
 
 });
 
+// 404
+app.use((req, res) => {
+    res.status(404).send("404 Not Found");
+});
+
 app.listen(PORT, () => {
-    console.log("PasteHub running on port " + PORT);
+    console.log(`PasteHub running on port ${PORT}`);
 });

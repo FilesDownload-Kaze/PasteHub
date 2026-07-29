@@ -47,9 +47,17 @@ function generateEditKey() {
 }
 
 // Home
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
 
-    const pastes = loadPastes();
+    const { data: pastes, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .order("created", { ascending: false });
+
+    if (error) {
+        console.log(error);
+        return res.status(500).send("Failed to load pastes");
+    }
 
     res.render("index", {
         pastes
@@ -163,13 +171,15 @@ await supabase
 });
 
 // Raw
-app.get("/raw/:id", (req, res) => {
+app.get("/raw/:id", async (req, res) => {
 
-    const pastes = loadPastes();
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
 
-    const paste = pastes.find(p => p.id === req.params.id);
-
-    if (!paste) {
+    if (error || !paste) {
         return res.status(404).send("Paste not found");
     }
 
@@ -180,13 +190,15 @@ app.get("/raw/:id", (req, res) => {
 
 
 // Edit Page
-app.get("/edit/:id", (req, res) => {
+app.get("/edit/:id", async (req, res) => {
 
-    const pastes = loadPastes();
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
 
-    const paste = pastes.find(p => p.id === req.params.id);
-
-    if (!paste) {
+    if (error || !paste) {
         return res.status(404).send("Paste not found");
     }
 
@@ -236,13 +248,15 @@ rows="15"
 });
 
 // Save Edit
-app.post("/edit/:id", (req, res) => {
+app.post("/edit/:id", async (req, res) => {
 
-    const pastes = loadPastes();
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
 
-    const paste = pastes.find(p => p.id === req.params.id);
-
-    if (!paste) {
+    if (error || !paste) {
         return res.status(404).send("Paste not found");
     }
 
@@ -257,12 +271,25 @@ app.post("/edit/:id", (req, res) => {
     });
 
     paste.title = req.body.title || "Untitled";
-    paste.content = req.body.content;
-    paste.updated = new Date().toISOString();
+paste.content = req.body.content;
+paste.updated = new Date().toISOString();
 
-    savePastes(pastes);
+const { error: updateError } = await supabase
+    .from("pastes")
+    .update({
+        title: paste.title,
+        content: paste.content,
+        updated: paste.updated,
+        history: paste.history
+    })
+    .eq("id", paste.id);
 
-    res.redirect("/paste/" + paste.id);
+if (updateError) {
+    console.log(updateError);
+    return res.status(500).send("Failed to update paste");
+}
+
+res.redirect("/paste/" + paste.id);
 
 });
 
@@ -289,3 +316,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
 });
+         

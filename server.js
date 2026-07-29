@@ -255,6 +255,19 @@ app.post("/edit/:id", (req, res) => {
 
 });
 
+app.get("/test-supabase", async (req, res) => {
+
+    const { data, error } = await supabase
+        .from("pastes")
+        .select("*");
+
+    if (error) {
+        return res.send(error.message);
+    }
+
+    res.json(data);
+
+});
 
 // 404 (PINAKA LAST)
 app.use((req, res) => {

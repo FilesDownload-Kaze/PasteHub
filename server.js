@@ -7,6 +7,9 @@ const supabase = createClient(
     process.env.SUPABASE_KEY
 );
 
+console.log("Supabase URL:", process.env.SUPABASE_URL);
+console.log("Supabase Key:", process.env.SUPABASE_KEY ? "Loaded" : "Missing");
+
 const express = require("express");
 const fs = require("fs");
 const path = require("path");

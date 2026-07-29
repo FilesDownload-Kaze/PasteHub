@@ -63,13 +63,11 @@ app.get("/create", (req, res) => {
 });
 
 // Create Paste
-app.post("/create", (req, res) => {
-
-    const pastes = loadPastes();
+app.post("/create", async (req, res) => {
 
     const id = nanoid(8);
 
-    pastes.push({
+    const pasteData = {
         id,
         title: req.body.title || "Untitled",
         content: req.body.content,
@@ -84,9 +82,16 @@ app.post("/create", (req, res) => {
                 editedAt: new Date().toISOString()
             }
         ]
-    });
+    };
 
-    savePastes(pastes);
+    const { error } = await supabase
+        .from("pastes")
+        .insert(pasteData);
+
+    if (error) {
+        console.log(error);
+        return res.status(500).send("Failed to save paste");
+    }
 
     res.redirect("/paste/" + id);
 

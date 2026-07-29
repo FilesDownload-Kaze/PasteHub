@@ -40,19 +40,22 @@ app.get("/", (req, res) => {
 });
 
 // Create Paste
-app.post("/create", (req, res) => {
-
-    const pastes = loadPastes();
-
-    const id = nanoid(8);
-
-    pastes.push({
-        id,
-        title: req.body.title || "Untitled",
-        content: req.body.content,
-        created: new Date().toISOString()
-    });
-
+pastes.push({
+    id,
+    title: req.body.title || "Untitled",
+    content: req.body.content,
+    created: new Date().toISOString(),
+    updated: new Date().toISOString(),
+    views: 0,
+    editKey: generateEditKey(),
+    history: [
+        {
+            title: req.body.title || "Untitled",
+            content: req.body.content,
+            editedAt: new Date().toISOString()
+        }
+    ]
+});
     savePastes(pastes);
 
     res.redirect("/paste/" + id);
@@ -70,6 +73,9 @@ app.get("/paste/:id", (req, res) => {
         return res.status(404).send("Paste not found");
     }
 
+    paste.views++;
+    savePastes(pastes);
+    
     res.send(`
 <!DOCTYPE html>
 <html>
@@ -85,6 +91,12 @@ app.get("/paste/:id", (req, res) => {
 <div class="container">
 
 <h1>${paste.title}</h1>
+
+<p>👁️ Views: ${paste.views}</p>
+
+<p>📅 Created: ${new Date(paste.created).toLocaleString()}</p>
+
+<p>✏️ Last Edited: ${new Date(paste.updated).toLocaleString()}</p>
 
 <textarea readonly>${paste.content}</textarea>
 

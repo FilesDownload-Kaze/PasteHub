@@ -104,12 +104,6 @@ app.get("/paste/:id", (req, res) => {
 
 <p>📅 Created: ${new Date(paste.created).toLocaleString()}</p>
 
-<br><br>
-
-<a href="/edit/${paste.id}?key=${paste.editKey}">
-<button>✏️ Edit Paste</button>
-</a>
-
 <p>✏️ Last Edited: ${new Date(paste.updated).toLocaleString()}</p>
 
 <textarea readonly>${paste.content}</textarea>
@@ -118,6 +112,12 @@ app.get("/paste/:id", (req, res) => {
 
 <a href="/raw/${paste.id}">
 <button>View RAW</button>
+</a>
+
+<br><br>
+
+<a href="/edit/${paste.id}?key=${paste.editKey}">
+<button>✏️ Edit Paste</button>
 </a>
 
 </div>

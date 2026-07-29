@@ -28,7 +28,8 @@ function savePastes(data) {
 }
 
 app.get("/", (req, res) => {
-    res.send(`
+    res.render("index");
+    
         <h1>PasteHub</h1>
 
         <form method="POST" action="/create">

@@ -28,6 +28,12 @@ function savePastes(data) {
     fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
 
+const crypto = require("crypto");
+
+function generateEditKey() {
+    return crypto.randomBytes(16).toString("hex");
+}
+
 // Home
 app.get("/", (req, res) => {
     res.render("index");

@@ -199,6 +199,22 @@ app.get("/raw/:id", async (req, res) => {
 
 });
 
+// Download Redirect
+app.get("/download/:id", async (req, res) => {
+
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("content")
+        .eq("id", req.params.id)
+        .single();
+
+    if (error || !paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    res.redirect(paste.content.trim());
+
+});
 
 // Edit Page
 app.get("/edit/:id", async (req, res) => {

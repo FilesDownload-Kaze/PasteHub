@@ -6,6 +6,8 @@
 
 <link rel="stylesheet" href="/style.css">
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 
 <body>
@@ -15,12 +17,11 @@
     <!-- HEADER -->
     <header class="home-header">
 
-        <div>
-            <h1>PasteHub</h1>
-            <p class="subtitle">
-                Your simple paste manager
-            </p>
-        </div>
+        <h1>PasteHub</h1>
+
+        <p class="subtitle">
+            Your simple paste manager
+        </p>
 
     </header>
 
@@ -57,7 +58,10 @@
 
             <div>
                 <h2>📁 Folders</h2>
-                <p>Organize your pastes into folders</p>
+
+                <p>
+                    Organize your pastes
+                </p>
             </div>
 
         </div>
@@ -72,19 +76,15 @@
                 <strong>No folders yet</strong>
 
                 <p>
-                    Create a folder to start organizing your pastes.
+                    Create your first folder.
                 </p>
-
-                <a href="/folder/add">
-                    <button>＋ Create Folder</button>
-                </a>
 
             </div>
 
         <% } else { %>
 
 
-            <div class="folder-grid">
+            <div class="folder-list">
 
                 <% folders.forEach(folder => { %>
 
@@ -119,32 +119,42 @@
 
                             </div>
 
-                            <div class="folder-arrow">
+                            <span class="folder-arrow">
                                 →
-                            </div>
+                            </span>
 
                         </a>
 
 
-                        <div class="folder-actions">
+                        <!-- MENU -->
+                        <div class="card-menu">
 
-                            <a
-                                href="/folder/rename/<%= encodeURIComponent(folder.name) %>"
+                            <button
+                                type="button"
+                                class="menu-button"
+                                onclick="toggleMenu(this)"
                             >
-                                <button>
+                                ⋮
+                            </button>
+
+
+                            <div class="menu-dropdown">
+
+                                <a
+                                    href="/folder/rename/<%= encodeURIComponent(folder.name) %>"
+                                >
                                     ✏️ Rename
-                                </button>
-                            </a>
+                                </a>
+
+                            </div>
 
                         </div>
 
                     </div>
 
-
                 <% }) %>
 
             </div>
-
 
         <% } %>
 
@@ -158,7 +168,10 @@
 
             <div>
                 <h2>📦 Other Pastes</h2>
-                <p>Pastes that aren't inside a folder</p>
+
+                <p>
+                    Pastes outside folders
+                </p>
             </div>
 
         </div>
@@ -184,7 +197,7 @@
                 </strong>
 
                 <p>
-                    Create a paste without selecting a folder.
+                    Create a paste to get started.
                 </p>
 
             </div>
@@ -199,14 +212,14 @@
 
                     <div class="paste-card">
 
-                        <div class="paste-main">
+                        <a
+                            href="/paste/<%= paste.id %>"
+                            class="paste-main"
+                        >
 
-                            <a
-                                href="/paste/<%= paste.id %>"
-                                class="paste-title"
-                            >
+                            <strong class="paste-title">
                                 <%= paste.title %>
-                            </a>
+                            </strong>
 
 
                             <div class="paste-meta">
@@ -222,27 +235,36 @@
 
                             </div>
 
-                        </div>
+                        </a>
 
 
-                        <div class="paste-actions">
+                        <!-- MENU -->
+                        <div class="card-menu">
 
-                            <a
-                                href="/edit/<%= paste.id %>?key=<%= paste.editKey %>"
+                            <button
+                                type="button"
+                                class="menu-button"
+                                onclick="toggleMenu(this)"
                             >
-                                <button>
+                                ⋮
+                            </button>
+
+
+                            <div class="menu-dropdown">
+
+                                <a
+                                    href="/edit/<%= paste.id %>?key=<%= paste.editKey %>"
+                                >
                                     ✏️ Edit
-                                </button>
-                            </a>
+                                </a>
 
-
-                            <a
-                                href="/paste/move/<%= paste.id %>"
-                            >
-                                <button>
+                                <a
+                                    href="/paste/move/<%= paste.id %>"
+                                >
                                     📁 Move
-                                </button>
-                            </a>
+                                </a>
+
+                            </div>
 
                         </div>
 
@@ -252,13 +274,48 @@
 
             </div>
 
-
         <% } %>
 
     </section>
 
 
 </div>
+
+
+<script>
+
+function toggleMenu(button) {
+
+    const menu = button.nextElementSibling;
+
+    document.querySelectorAll(".menu-dropdown").forEach(function(item) {
+
+        if (item !== menu) {
+            item.classList.remove("show");
+        }
+
+    });
+
+    menu.classList.toggle("show");
+
+}
+
+
+document.addEventListener("click", function(event) {
+
+    if (!event.target.closest(".card-menu")) {
+
+        document.querySelectorAll(".menu-dropdown").forEach(function(menu) {
+
+            menu.classList.remove("show");
+
+        });
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>

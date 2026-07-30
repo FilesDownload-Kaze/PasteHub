@@ -661,6 +661,27 @@ pre {
     }
 }
 
+.top-navbar{
+
+    margin:-21px -15px 24px;
+    padding:14px 15px;
+}
+
+.nav-title{
+
+    font-size:24px;
+}
+
+.hero h1{
+
+    font-size:32px;
+}
+
+.hero p{
+
+    font-size:15px;
+}
+
 /* =========================================================
    VERY SMALL PHONES
 ========================================================= */
@@ -747,4 +768,69 @@ pre {
 
 #topMenu a:hover{
     background:#263449;
+}
+
+/* ===========================
+   TOP NAVBAR
+=========================== */
+
+.top-navbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:14px 18px;
+
+    margin:-28px -28px 28px;
+
+    background:#101826;
+
+    border-bottom:1px solid #26364d;
+}
+
+.nav-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.nav-logo{
+    font-size:28px;
+}
+
+.nav-title{
+
+    color:white;
+
+    font-size:26px;
+    font-weight:700;
+}
+
+.nav-right{
+
+    position:relative;
+}
+
+/* ===========================
+   HERO
+=========================== */
+
+.hero{
+
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.hero h1{
+
+    color:white;
+    font-size:40px;
+    margin-bottom:8px;
+}
+
+.hero p{
+
+    color:#94a3b8;
+    font-size:17px;
 }

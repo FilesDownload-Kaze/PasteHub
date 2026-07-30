@@ -24,26 +24,33 @@
 <button>📁 Add Folder</button>
 </a>
 
-<a href="/all-pastes">
-<button>📦 All Pastes</button>
-</a>
-
 </div>
 
-<h2>Folders</h2>
+
+<!-- FOLDERS -->
+<h2>📁 Folders</h2>
 
 <%
 const folderMap = {};
+const noFolderPastes = [];
 
 pastes.forEach(paste => {
 
-    const folder = paste.folder || "Uncategorized";
+    if (!paste.folder || paste.folder === "None") {
 
-    if (!folderMap[folder]) {
-        folderMap[folder] = [];
+        noFolderPastes.push(paste);
+
+    } else {
+
+        const folder = paste.folder;
+
+        if (!folderMap[folder]) {
+            folderMap[folder] = [];
+        }
+
+        folderMap[folder].push(paste);
+
     }
-
-    folderMap[folder].push(paste);
 
 });
 %>
@@ -61,20 +68,59 @@ pastes.forEach(paste => {
 <div class="folder-box">
 
     <h3>
-    📁
-    <a href="/folder/<%= encodeURIComponent(folder) %>">
-        <%= folder %>
-    </a>
-</h3>
+        📁
+        <a href="/folder/<%= encodeURIComponent(folder) %>">
+            <%= folder %>
+        </a>
+    </h3>
 
-<a href="/folder/rename/<%= encodeURIComponent(folder) %>">
-    <button>✏️ Rename</button>
-</a>
+    <a href="/folder/rename/<%= encodeURIComponent(folder) %>">
+        <button>✏️ Rename</button>
+    </a>
 
     <p>
         <%= folderMap[folder].length %>
         paste<%= folderMap[folder].length === 1 ? "" : "s" %>
     </p>
+
+</div>
+
+<br>
+
+<% }) %>
+
+
+<!-- PASTES WITHOUT FOLDER -->
+<h2>📦 Other Pastes</h2>
+
+<% if (noFolderPastes.length === 0) { %>
+
+<p>No standalone pastes.</p>
+
+<% } %>
+
+
+<% noFolderPastes.forEach(paste => { %>
+
+<div class="paste-box">
+
+    <h3>
+        <a href="/paste/<%= paste.id %>">
+            <%= paste.title %>
+        </a>
+    </h3>
+
+    <p>
+        👁️ Views: <%= paste.views %>
+    </p>
+
+    <p>
+        📅 <%= new Date(paste.created).toLocaleString() %>
+    </p>
+
+    <a href="/edit/<%= paste.id %>?key=<%= paste.editKey %>">
+        <button>✏️ Edit</button>
+    </a>
 
 </div>
 

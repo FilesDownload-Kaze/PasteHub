@@ -38,7 +38,9 @@ placeholder="Paste your code/text here..."
 
 <select name="folder" id="folder">
 
-    <option value="">None</option>
+    <option value="">
+        None
+    </option>
 
     <option value="__CREATE_FOLDER__">
         ➕ Create folder
@@ -47,10 +49,10 @@ placeholder="Paste your code/text here..."
     <% folders.forEach(folder => { %>
 
         <option
-            value="<%= folder %>"
-            <%= selectedFolder === folder ? "selected" : "" %>
+            value="<%= folder.name %>"
+            <%= selectedFolder === folder.name ? "selected" : "" %>
         >
-            📁 <%= folder %>
+            📁 <%= folder.name %>
         </option>
 
     <% }) %>
@@ -65,12 +67,15 @@ placeholder="Paste your code/text here..."
 
 </form>
 
+
 <script>
 
 document.getElementById("folder").addEventListener("change", function() {
 
     if (this.value === "__CREATE_FOLDER__") {
+
         window.location.href = "/folder/add";
+
     }
 
 });

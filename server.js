@@ -1131,6 +1131,50 @@ app.get("/debug-my-account", async (req, res) => {
     });
 });
 
+app.get("/restore-admin-data", async (req, res) => {
+
+    if (!req.session.user) {
+        return res.status(401).send("Not logged in");
+    }
+
+    const userId = req.session.user.id;
+
+    // Link old folders to the logged-in account
+    const { error: folderError } = await supabase
+        .from("folders")
+        .update({
+            userId: userId
+        })
+        .is("userId", null);
+
+    if (folderError) {
+        console.log("RESTORE FOLDERS ERROR:", folderError);
+        return res.status(500).send(folderError.message);
+    }
+
+    // Link old pastes to the logged-in account
+    const { error: pasteError } = await supabase
+        .from("pastes")
+        .update({
+            userId: userId
+        })
+        .is("userId", null);
+
+    if (pasteError) {
+        console.log("RESTORE PASTES ERROR:", pasteError);
+        return res.status(500).send(pasteError.message);
+    }
+
+    res.send(`
+        <h2>✅ Restore complete!</h2>
+        <p>Folders and pastes with NULL userId were linked to:</p>
+        <p><strong>${req.session.user.username}</strong></p>
+        <p>User ID: ${userId}</p>
+        <br>
+        <a href="/">Go to PasteHub</a>
+    `);
+});
+
 /* =========================================================
    404
 ========================================================= */

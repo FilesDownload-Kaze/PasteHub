@@ -251,7 +251,7 @@ app.post("/create", async (req, res) => {
         id,
         title: req.body.title || "Untitled",
         content: req.body.content || "",
-        folder: req.body.folder || "Uncategorized",
+        folder: req.body.folder || null,
         created: now,
         updated: now,
         views: 0,

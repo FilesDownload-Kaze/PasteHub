@@ -63,11 +63,17 @@ function generateEditKey() {
    HOME
 ========================================================= */
 
+
 app.get("/", async (req, res) => {
+
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
 
     const { data: pastes, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .order("created", { ascending: false });
 
     if (error) {
@@ -90,6 +96,7 @@ app.get("/", async (req, res) => {
         folders: folders || []
     });
 });
+
 
 
 /* =========================================================
@@ -202,9 +209,10 @@ app.post("/folder/add", async (req, res) => {
     const { error: insertError } = await supabase
         .from("folders")
         .insert({
-            id: nanoid(8),
-            name: name,
-            created: new Date().toISOString()
+           id: nanoid(8),
+           userId: req.session.user.id,
+           name: name,
+           created: new Date().toISOString()
         });
 
     if (insertError) {
@@ -441,6 +449,7 @@ app.post("/create", async (req, res) => {
 
     const pasteData = {
         id,
+        userld: req.session.user.id, // <-- ADD THIS
         title,
         content,
         folder,
@@ -770,9 +779,10 @@ app.get("/paste/move/:id", async (req, res) => {
     */
 
     const { data: folders, error: folderError } = await supabase
-        .from("folders")
-        .select("*")
-        .order("created", { ascending: true });
+         .from("folders")
+         .select("*")
+         .eq("userId", req.session.user.id)
+         .order("created", { ascending: true });
 
     if (folderError) {
         console.log("MOVE FOLDER ERROR:", folderError);

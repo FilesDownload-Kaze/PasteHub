@@ -28,59 +28,40 @@
 
 
 <!-- FOLDERS -->
+
 <h2>📁 Folders</h2>
 
-<%
-const folderMap = {};
-const noFolderPastes = [];
-
-pastes.forEach(paste => {
-
-    if (!paste.folder || paste.folder === "None") {
-
-        noFolderPastes.push(paste);
-
-    } else {
-
-        const folder = paste.folder;
-
-        if (!folderMap[folder]) {
-            folderMap[folder] = [];
-        }
-
-        folderMap[folder].push(paste);
-
-    }
-
-});
-%>
-
-
-<% if (Object.keys(folderMap).length === 0) { %>
+<% if (!folders || folders.length === 0) { %>
 
 <p>No folders yet.</p>
 
 <% } %>
 
 
-<% Object.keys(folderMap).forEach(folder => { %>
+<% (folders || []).forEach(folder => { %>
 
 <div class="folder-box">
 
     <h3>
         📁
-        <a href="/folder/<%= encodeURIComponent(folder) %>">
-            <%= folder %>
+        <a href="/folder/<%= encodeURIComponent(folder.name) %>">
+            <%= folder.name %>
         </a>
     </h3>
 
-    <a href="/folder/rename/<%= encodeURIComponent(folder) %>">
+    <a href="/folder/rename/<%= encodeURIComponent(folder.name) %>">
         <button>✏️ Rename</button>
     </a>
 
+    <%
+    const folderPastes = pastes.filter(
+        paste => paste.folder === folder.name
+    );
+    %>
+
     <p>
-        <%= folderMap[folder].length %>
-        paste<%= folderMap[folder].length === 1 ? "" : "s" %>
+        <%= folderPastes.length %>
+        paste<%= folderPastes.length === 1 ? "" : "s" %>
     </p>
 
 </div>
@@ -90,8 +71,16 @@ pastes.forEach(paste => {
 <% }) %>
 
 
-<!-- PASTES WITHOUT FOLDER -->
+<!-- OTHER PASTES -->
+
 <h2>📦 Other Pastes</h2>
+
+<%
+const noFolderPastes = (pastes || []).filter(
+    paste => !paste.folder || paste.folder === "None"
+);
+%>
+
 
 <% if (noFolderPastes.length === 0) { %>
 

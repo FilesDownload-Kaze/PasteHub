@@ -974,6 +974,52 @@ app.get("/register", (req, res) => {
 });
 
 /* =========================================================
+   REGISTER 
+========================================================= */
+
+app.post("/register", async (req, res) => {
+
+    const username = (req.body.username || "").trim();
+    const password = req.body.password || "";
+
+    if (!username || !password) {
+        return res.status(400).send("Username and password are required");
+    }
+
+    const { data: existing, error: checkError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("username", username)
+        .limit(1);
+
+    if (checkError) {
+        console.log(checkError);
+        return res.status(500).send("Database error");
+    }
+
+    if (existing.length > 0) {
+        return res.status(400).send("Username already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const { error: insertError } = await supabase
+        .from("users")
+        .insert({
+            id: nanoid(8),
+            username: username,
+            password: hashedPassword
+        });
+
+    if (insertError) {
+        console.log(insertError);
+        return res.status(500).send("Failed to create account");
+    }
+
+    res.redirect("/login");
+});
+
+/* =========================================================
    404
 ========================================================= */
 

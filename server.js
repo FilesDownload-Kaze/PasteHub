@@ -537,6 +537,128 @@ app.post("/delete/:id", async (req, res) => {
     res.redirect("/");
 });
 
+// Move Paste - Page
+app.get("/paste/move/:id", async (req, res) => {
+
+    const { data: paste, error: pasteError } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
+
+    if (pasteError || !paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    const { data: folders, error: folderError } = await supabase
+        .from("pastes")
+        .select("folder")
+        .not("folder", "is", null);
+
+    if (folderError) {
+        console.log("MOVE FOLDER ERROR:", folderError);
+        return res.status(500).send("Failed to load folders");
+    }
+
+    const uniqueFolders = [
+        ...new Set(
+            folders
+                .map(item => item.folder)
+                .filter(folder => folder && folder !== "None")
+        )
+    ];
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Move Paste - PasteHub</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📁 Move Paste</h1>
+
+<h2>${paste.title}</h2>
+
+<form method="POST" action="/paste/move/${paste.id}">
+
+<label>Select Folder:</label>
+
+<br><br>
+
+<select name="folder">
+
+    <option value="">None</option>
+
+    ${uniqueFolders.map(folder => `
+        <option value="${folder}">
+            ${folder}
+        </option>
+    `).join("")}
+
+</select>
+
+<br><br>
+
+<button type="submit">
+📁 Move Paste
+</button>
+
+</form>
+
+<br>
+
+<a href="/">
+    <button>← Back</button>
+</a>
+
+</div>
+
+</body>
+</html>
+    `);
+});
+
+
+// Move Paste - Save
+app.post("/paste/move/:id", async (req, res) => {
+
+    const folder = (req.body.folder || "").trim();
+
+    const newFolder = folder === "" ? null : folder;
+
+    const { data: paste, error: pasteError } = await supabase
+        .from("pastes")
+        .select("id")
+        .eq("id", req.params.id)
+        .single();
+
+    if (pasteError || !paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    const { error: updateError } = await supabase
+        .from("pastes")
+        .update({
+            folder: newFolder
+        })
+        .eq("id", req.params.id);
+
+    if (updateError) {
+        console.log("MOVE PASTE ERROR:", updateError);
+        return res.status(500).send("Failed to move paste");
+    }
+
+    res.redirect("/");
+});
+
 // 404 (PINAKA LAST)
 app.use((req, res) => {
     res.status(404).send("404 Not Found");

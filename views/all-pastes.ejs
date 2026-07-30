@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>All Pastes - PasteHub</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📦 All Pastes</h1>
+
+<a href="/">
+<button>← Back to Folders</button>
+</a>
+
+<br><br>
+
+<% if (pastes.length === 0) { %>
+
+<p>No pastes yet.</p>
+
+<% } %>
+
+<% pastes.forEach(paste => { %>
+
+<div class="paste-box">
+
+<h3>
+<a href="/paste/<%= paste.id %>">
+<%= paste.title %>
+</a>
+</h3>
+
+<p>
+📁 Folder:
+<strong>
+<%= paste.folder || "None" %>
+</strong>
+</p>
+
+<p>
+👁️ Views: <%= paste.views %>
+</p>
+
+<p>
+📅 <%= new Date(paste.created).toLocaleString() %>
+</p>
+
+<a href="/edit/<%= paste.id %>?key=<%= paste.editKey %>">
+<button>✏️ Edit</button>
+</a>
+
+</div>
+
+<br>
+
+<% }) %>
+
+</div>
+
+</body>
+</html>

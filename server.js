@@ -1012,8 +1012,8 @@ app.post("/register", async (req, res) => {
         });
 
     if (insertError) {
-        console.log(insertError);
-        return res.status(500).send("Failed to create account");
+    console.log("REGISTER ERROR:", insertError);
+    return res.status(500).send(insertError.message);
     }
 
     res.redirect("/login");

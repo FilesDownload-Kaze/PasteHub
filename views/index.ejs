@@ -63,13 +63,9 @@ pastes.forEach(paste => {
     </a>
 </h3>
 
-<% if (folder !== "Uncategorized") { %>
-
 <a href="/folder/rename/<%= encodeURIComponent(folder) %>">
     <button>✏️ Rename</button>
 </a>
-
-<% } %>
 
     <p>
         <%= folderMap[folder].length %>

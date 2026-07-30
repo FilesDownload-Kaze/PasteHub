@@ -661,21 +661,6 @@ pre {
     }
 }
 
-.logout-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: .2s;
-}
-
-.logout-btn:hover {
-    background: #c82333;
-}
-
 /* =========================================================
    VERY SMALL PHONES
 ========================================================= */
@@ -701,4 +686,65 @@ pre {
     .action-card {
         min-height: 64px;
     }
+}
+
+/* =========================================================
+   TOP HEADER MENU
+========================================================= */
+
+.home-header{
+    position:relative;
+    text-align:center;
+    margin-bottom:28px;
+}
+
+.header-menu{
+    position:absolute;
+    right:0;
+    top:0;
+}
+
+.header-menu .menu-button{
+    width:42px;
+    height:42px;
+    background:transparent;
+    border:none;
+    color:#94a3b8;
+    font-size:28px;
+    cursor:pointer;
+}
+
+.header-menu .menu-button:hover{
+    background:#334155;
+    border-radius:10px;
+    color:#fff;
+}
+
+#headerMenu{
+    display:none;
+    position:absolute;
+    right:0;
+    top:48px;
+    width:200px;
+    background:#172235;
+    border:1px solid #334155;
+    border-radius:12px;
+    overflow:hidden;
+    z-index:999;
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+#headerMenu.show{
+    display:block;
+}
+
+#headerMenu a{
+    display:block;
+    padding:14px 16px;
+    color:#e5e7eb;
+    text-decoration:none;
+}
+
+#headerMenu a:hover{
+    background:#263449;
 }

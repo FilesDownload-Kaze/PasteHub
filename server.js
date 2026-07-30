@@ -74,20 +74,22 @@ app.get("/create", (req, res) => {
 app.post("/create", async (req, res) => {
 
     const id = nanoid(8);
+    const now = new Date().toISOString();
 
     const pasteData = {
         id,
         title: req.body.title || "Untitled",
-        content: req.body.content,
-        created: new Date().toISOString(),
-        updated: new Date().toISOString(),
+        content: req.body.content || "",
+        folder: req.body.folder || "Uncategorized",
+        created: now,
+        updated: now,
         views: 0,
         editKey: generateEditKey(),
         history: [
             {
                 title: req.body.title || "Untitled",
-                content: req.body.content,
-                editedAt: new Date().toISOString()
+                content: req.body.content || "",
+                editedAt: now
             }
         ]
     };

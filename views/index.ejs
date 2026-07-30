@@ -15,26 +15,31 @@
 <div class="container">
 
     <!-- HEADER -->
-    <header class="home-header">
+    <!-- TOP NAVBAR -->
+<header class="top-navbar">
 
-    <div class="header-menu">
+    <div class="nav-left">
+        <span class="nav-logo">📋</span>
+        <span class="nav-title">PasteHub</span>
+    </div>
+
+    <div class="nav-right">
 
         <button
             class="menu-button"
-            onclick="toggleTopMenu(event)"
-        >
+            onclick="toggleTopMenu(event)">
             ⋮
         </button>
 
-        <div
-            id="topMenu"
-            class="menu-dropdown"
-        >
+        <div id="topMenu" class="menu-dropdown">
+
+            <a href="#">
+                👤 Account
+            </a>
 
             <a
                 href="https://t.me/KAZEHAYAMODZ"
-                target="_blank"
-            >
+                target="_blank">
                 💬 Contact Developer
             </a>
 
@@ -46,13 +51,18 @@
 
     </div>
 
-    <h1>PasteHub</h1>
+</header>
 
-    <p class="subtitle">
-        Your simple paste manager
+<!-- HERO -->
+<div class="hero">
+
+    <h1>Welcome back 👋</h1>
+
+    <p>
+        Manage all your pastes in one place.
     </p>
 
-</header>
+</div>
 
 
     <!-- QUICK ACTIONS -->

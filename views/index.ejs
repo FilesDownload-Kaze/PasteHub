@@ -57,11 +57,19 @@ pastes.forEach(paste => {
 <div class="folder-box">
 
     <h3>
-        📁
-        <a href="/folder/<%= encodeURIComponent(folder) %>">
-            <%= folder %>
-        </a>
-    </h3>
+    📁
+    <a href="/folder/<%= encodeURIComponent(folder) %>">
+        <%= folder %>
+    </a>
+</h3>
+
+<% if (folder !== "Uncategorized") { %>
+
+<a href="/folder/rename/<%= encodeURIComponent(folder) %>">
+    <button>✏️ Rename</button>
+</a>
+
+<% } %>
 
     <p>
         <%= folderMap[folder].length %>

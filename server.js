@@ -65,6 +65,29 @@ app.get("/", async (req, res) => {
 
 });
 
+// Open Folder
+app.get("/folder/:name", async (req, res) => {
+
+    const folderName = decodeURIComponent(req.params.name);
+
+    const { data: pastes, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("folder", folderName)
+        .order("created", { ascending: false });
+
+    if (error) {
+        console.log("FOLDER ERROR:", error);
+        return res.status(500).send("Failed to load folder");
+    }
+
+    res.render("folder", {
+        folder: folderName,
+        pastes
+    });
+
+});
+
 // Create Page
 app.get("/create", (req, res) => {
     res.render("create");

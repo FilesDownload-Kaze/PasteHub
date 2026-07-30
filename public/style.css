@@ -1,77 +1,162 @@
-/* =========================
-   PHONE-FIRST HOME
-========================= */
+/* =========================================================
+   PASTEHUB — MODERN DARK PHONE-FIRST UI
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 16px 10px;
+}
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.container {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+
+    padding: 28px;
+    background: #162235;
+
+    border: 1px solid #26364d;
+    border-radius: 18px;
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .35);
+}
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+h1 {
+    color: #f8fafc;
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 24px;
+}
+
+h2 {
+    color: #f8fafc;
+    font-size: 22px;
+    margin: 28px 0 13px;
+}
+
+h3 {
+    color: #f8fafc;
+    font-size: 18px;
+}
+
+p {
+    color: #cbd5e1;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #93c5fd;
+}
+
+/* =========================================================
+   HOME HEADER
+========================================================= */
 
 .home-header {
     text-align: center;
-    margin-bottom: 22px;
+    margin-bottom: 26px;
 }
 
 .home-header h1 {
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .subtitle {
     color: #94a3b8;
-    font-size: 14px;
+    font-size: 15px;
 }
 
-
-/* =========================
+/* =========================================================
    QUICK ACTIONS
-========================= */
+========================================================= */
 
 .quick-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 26px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+    margin-bottom: 30px;
 }
 
 .action-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 13px;
+    gap: 12px;
+
+    min-height: 72px;
+    padding: 15px;
+
     background: #263449;
     border: 1px solid #334155;
-    border-radius: 10px;
+    border-radius: 13px;
+
     color: #fff;
     text-decoration: none;
+
+    transition: .15s ease;
 }
 
 .action-card:hover {
     background: #2d3c52;
+    transform: translateY(-1px);
     text-decoration: none;
 }
 
 .action-icon {
-    font-size: 20px;
+    flex-shrink: 0;
+    font-size: 25px;
 }
 
 .action-card strong {
     display: block;
-    font-size: 14px;
+    color: #f8fafc;
+    font-size: 16px;
 }
 
 .action-card small {
     display: block;
-    margin-top: 3px;
+    margin-top: 4px;
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 12px;
 }
 
-
-/* =========================
-   SECTIONS
-========================= */
+/* =========================================================
+   HOME SECTIONS
+========================================================= */
 
 .home-section {
-    margin-top: 24px;
+    margin-top: 30px;
 }
 
 .section-header {
-    margin-bottom: 10px;
+    margin-bottom: 13px;
 }
 
 .section-header h2 {
@@ -79,39 +164,52 @@
 }
 
 .section-header p {
-    margin-top: 4px;
+    margin-top: 5px;
     color: #94a3b8;
-    font-size: 13px;
+    font-size: 14px;
 }
 
-
-/* =========================
+/* =========================================================
    FOLDER LIST
-========================= */
+========================================================= */
 
 .folder-list {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 11px;
 }
 
 .folder-card {
     position: relative;
+
     display: flex;
     align-items: center;
+
+    width: 100%;
+    min-height: 70px;
+
     background: #263449;
     border: 1px solid #334155;
-    border-radius: 10px;
+    border-radius: 13px;
+
     overflow: visible;
+    transition: .15s ease;
+}
+
+.folder-card:hover {
+    background: #2d3c52;
 }
 
 .folder-main {
     flex: 1;
     min-width: 0;
+
     display: flex;
     align-items: center;
-    gap: 11px;
-    padding: 14px;
+    gap: 13px;
+
+    padding: 15px;
+
     color: #fff;
     text-decoration: none;
 }
@@ -121,7 +219,8 @@
 }
 
 .folder-icon {
-    font-size: 22px;
+    flex-shrink: 0;
+    font-size: 27px;
 }
 
 .folder-info {
@@ -130,8 +229,10 @@
 
 .folder-info strong {
     display: block;
+
     color: #60a5fa;
-    font-size: 15px;
+    font-size: 16px;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -139,41 +240,55 @@
 
 .folder-info span {
     display: block;
-    margin-top: 3px;
+
+    margin-top: 4px;
+
     color: #94a3b8;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .folder-arrow {
     margin-left: auto;
     color: #64748b;
-    font-size: 20px;
+    font-size: 22px;
 }
 
-
-/* =========================
+/* =========================================================
    PASTE LIST
-========================= */
+========================================================= */
 
 .paste-list {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 11px;
 }
 
 .paste-card {
     position: relative;
+
     display: flex;
     align-items: center;
+
+    width: 100%;
+    min-height: 75px;
+
     background: #263449;
     border: 1px solid #334155;
-    border-radius: 10px;
+    border-radius: 13px;
+
+    transition: .15s ease;
+}
+
+.paste-card:hover {
+    background: #2d3c52;
 }
 
 .paste-main {
     flex: 1;
     min-width: 0;
-    padding: 14px;
+
+    padding: 16px;
+
     color: #fff;
     text-decoration: none;
 }
@@ -184,8 +299,11 @@
 
 .paste-title {
     display: block;
+
     color: #60a5fa;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 600;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -195,31 +313,43 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+
     margin-top: 7px;
+
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 12px;
 }
 
-
-/* =========================
+/* =========================================================
    THREE DOT MENU
-========================= */
+========================================================= */
 
 .card-menu {
     position: relative;
     flex-shrink: 0;
-    margin-right: 7px;
+    margin-right: 9px;
 }
 
 .menu-button {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
+
     padding: 0;
-    border-radius: 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 9px;
+
     background: transparent;
     color: #94a3b8;
-    font-size: 22px;
+
+    font-size: 25px;
     line-height: 1;
+
+    cursor: pointer;
 }
 
 .menu-button:hover {
@@ -230,16 +360,22 @@
 
 .menu-dropdown {
     display: none;
+
     position: absolute;
     right: 0;
-    top: 40px;
-    min-width: 130px;
-    z-index: 50;
-    padding: 5px;
+    top: 48px;
+
+    min-width: 155px;
+
+    z-index: 100;
+
+    padding: 6px;
+
     background: #172235;
     border: 1px solid #3b4a60;
-    border-radius: 9px;
-    box-shadow: 0 10px 25px rgba(0,0,0,.4);
+    border-radius: 11px;
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
 }
 
 .menu-dropdown.show {
@@ -248,160 +384,306 @@
 
 .menu-dropdown a {
     display: block;
-    padding: 9px 10px;
-    border-radius: 6px;
+
+    padding: 11px 12px;
+
+    border-radius: 8px;
+
     color: #e5e7eb;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .menu-dropdown a:hover {
     background: #263449;
+    color: #fff;
     text-decoration: none;
 }
 
-
-/* =========================
+/* =========================================================
    EMPTY STATE
-========================= */
+========================================================= */
 
 .empty-state {
     text-align: center;
-    padding: 28px 15px;
+
+    padding: 35px 18px;
+
     background: #263449;
     border: 1px solid #334155;
-    border-radius: 10px;
+    border-radius: 13px;
 }
 
 .empty-icon {
-    font-size: 28px;
-    margin-bottom: 8px;
+    font-size: 34px;
+    margin-bottom: 10px;
 }
 
 .empty-state strong {
     display: block;
+    color: #f8fafc;
+    font-size: 16px;
 }
 
 .empty-state p {
-    margin-top: 5px;
+    margin-top: 6px;
     color: #94a3b8;
-    font-size: 13px;
+    font-size: 14px;
 }
 
+/* =========================================================
+   NORMAL BUTTONS
+========================================================= */
 
-/* =========================
-   MOBILE
-========================= */
+button {
+    min-height: 44px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #3b82f6;
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   FORMS
+========================================================= */
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    padding: 15px 16px;
+
+    margin-top: 9px;
+    margin-bottom: 18px;
+
+    border: 1px solid #3b4a60;
+    border-radius: 10px;
+
+    background: #202d40;
+    color: #f8fafc;
+
+    outline: none;
+
+    font-size: 16px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, .12);
+}
+
+textarea {
+    min-height: 420px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+select {
+    cursor: pointer;
+}
+
+/* =========================================================
+   PASTE VIEW
+========================================================= */
+
+pre {
+    width: 100%;
+
+    padding: 18px;
+    margin: 18px 0;
+
+    background: #111c2d;
+    border: 1px solid #334155;
+    border-radius: 10px;
+
+    color: #e5e7eb;
+
+    font-size: 15px;
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+}
+
+/* =========================================================
+   MOBILE — BIG & COMFORTABLE
+========================================================= */
 
 @media (max-width: 600px) {
 
     body {
-        padding: 8px 6px;
+        padding: 10px 7px;
     }
 
     .container {
         width: 100%;
         max-width: none;
-        padding: 15px;
-        border-radius: 12px;
+
+        padding: 21px 15px;
+
+        border-radius: 15px;
     }
 
     h1 {
-        font-size: 23px;
+        font-size: 29px;
+        margin-bottom: 22px;
     }
 
+    h2 {
+        font-size: 21px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    p {
+        font-size: 15px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    /* Quick actions */
+
     .quick-actions {
-        gap: 8px;
+        gap: 10px;
     }
 
     .action-card {
-        padding: 12px 10px;
+        min-height: 78px;
+        padding: 14px 11px;
+        gap: 9px;
+    }
+
+    .action-icon {
+        font-size: 24px;
     }
 
     .action-card strong {
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .action-card small {
         font-size: 10px;
     }
 
-    .folder-main,
-    .paste-main {
-        padding: 13px 11px;
+    /* Cards */
+
+    .folder-card {
+        min-height: 72px;
     }
 
+    .paste-card {
+        min-height: 78px;
+    }
+
+    .folder-main {
+        padding: 15px 12px;
+    }
+
+    .paste-main {
+        padding: 16px 12px;
+    }
+
+    .folder-icon {
+        font-size: 25px;
+    }
+
+    .folder-info strong,
+    .paste-title {
+        font-size: 16px;
+    }
+
+    .folder-info span,
+    .paste-meta {
+        font-size: 12px;
+    }
+
+    /* Menu */
+
+    .menu-button {
+        width: 44px;
+        height: 44px;
+        font-size: 26px;
+    }
+
+    .menu-dropdown {
+        top: 50px;
+        min-width: 165px;
+    }
+
+    .menu-dropdown a {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* Forms */
+
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    textarea {
+        min-height: 430px;
+    }
+
+    button {
+        width: 100%;
+        min-height: 48px;
+        font-size: 15px;
+    }
 }
 
-/* =========================
-   PASTEHUB DARK THEME
-========================= */
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
 
-html,
-body {
-    background: #0f172a !important;
-    color: #e5e7eb !important;
-}
+@media (max-width: 380px) {
 
-body {
-    min-height: 100vh;
-}
+    body {
+        padding: 7px 5px;
+    }
 
-.container {
-    background: #1e293b !important;
-    color: #e5e7eb !important;
-}
+    .container {
+        padding: 18px 12px;
+    }
 
-h1,
-h2,
-h3,
-strong {
-    color: #f8fafc;
-}
+    h1 {
+        font-size: 26px;
+    }
 
-.subtitle,
-.section-header p,
-.empty-state p {
-    color: #94a3b8;
-}
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
 
-.folder-card,
-.paste-card,
-.action-card,
-.empty-state {
-    background: #263449 !important;
-    border-color: #334155 !important;
-}
-
-.folder-card:hover,
-.paste-card:hover,
-.action-card:hover {
-    background: #2d3c52 !important;
-}
-
-.folder-info strong,
-.paste-title,
-a {
-    color: #60a5fa;
-}
-
-.menu-dropdown {
-    background: #172235 !important;
-    border-color: #3b4a60 !important;
-}
-
-.menu-dropdown a {
-    color: #e5e7eb;
-}
-
-.menu-dropdown a:hover {
-    background: #263449;
-}
-
-.menu-button {
-    color: #94a3b8;
-}
-
-.menu-button:hover {
-    background: #334155;
-    color: #fff;
+    .action-card {
+        min-height: 64px;
+    }
 }

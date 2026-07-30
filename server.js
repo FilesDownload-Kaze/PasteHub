@@ -93,10 +93,6 @@ app.get("/folder/rename/:name", (req, res) => {
 
     const folderName = decodeURIComponent(req.params.name);
 
-    if (folderName === "Uncategorized") {
-        return res.status(400).send("Cannot rename Uncategorized");
-    }
-
     res.send(`
 <!DOCTYPE html>
 <html>
@@ -160,10 +156,6 @@ app.post("/folder/rename", async (req, res) => {
 
     if (!oldName || !newName) {
         return res.status(400).send("Folder name is required");
-    }
-
-    if (oldName === "Uncategorized") {
-        return res.status(400).send("Cannot rename Uncategorized");
     }
 
     if (oldName === newName) {
@@ -512,3 +504,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
 });
+    

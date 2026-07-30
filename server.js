@@ -1064,6 +1064,41 @@ app.post("/login", async (req, res) => {
 });
 
 /* =========================================================
+   SETUP ADMIN (ONE TIME)
+========================================================= */
+
+app.get("/setup-admin", async (req, res) => {
+
+    const { data: existing } = await supabase
+        .from("users")
+        .select("id")
+        .eq("username", "KAZEHAYAMODZ")
+        .limit(1);
+
+    if (existing && existing.length > 0) {
+        return res.send("✅ Admin already exists.");
+    }
+
+    const hashedPassword = await bcrypt.hash("Kaze82809353", 10);
+
+    const { error } = await supabase
+        .from("users")
+        .insert({
+            id: nanoid(8),
+            username: "KAZEHAYAMODZ",
+            email: "kaze@pastehub.local",
+            password: hashedPassword
+        });
+
+    if (error) {
+        console.log(error);
+        return res.send(error.message);
+    }
+
+    res.send("✅ Admin account created! Username: KAZEHAYAMODZ Password: Kaze82809353");
+});
+
+/* =========================================================
    404
 ========================================================= */
 

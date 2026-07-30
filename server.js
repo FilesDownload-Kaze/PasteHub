@@ -88,6 +88,120 @@ app.get("/folder/:name", async (req, res) => {
 
 });
 
+// Rename Folder
+app.get("/folder/rename/:name", (req, res) => {
+
+    const folderName = decodeURIComponent(req.params.name);
+
+    if (folderName === "Uncategorized") {
+        return res.status(400).send("Cannot rename Uncategorized");
+    }
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Rename Folder - PasteHub</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>✏️ Rename Folder</h1>
+
+<form method="POST" action="/folder/rename">
+
+<input
+    type="hidden"
+    name="oldName"
+    value="${folderName}"
+>
+
+<input
+    type="text"
+    name="newName"
+    value="${folderName}"
+    placeholder="New folder name"
+    required
+>
+
+<br><br>
+
+<button type="submit">
+💾 Save Name
+</button>
+
+<a href="/">
+<button type="button">
+Cancel
+</button>
+</a>
+
+</form>
+
+</div>
+
+</body>
+</html>
+    `);
+});
+
+
+// Save Renamed Folder
+app.post("/folder/rename", async (req, res) => {
+
+    const oldName = (req.body.oldName || "").trim();
+    const newName = (req.body.newName || "").trim();
+
+    if (!oldName || !newName) {
+        return res.status(400).send("Folder name is required");
+    }
+
+    if (oldName === "Uncategorized") {
+        return res.status(400).send("Cannot rename Uncategorized");
+    }
+
+    if (oldName === newName) {
+        return res.redirect("/");
+    }
+
+    // Check if new folder name already exists
+    const { data: existing, error: checkError } = await supabase
+        .from("pastes")
+        .select("id")
+        .eq("folder", newName)
+        .limit(1);
+
+    if (checkError) {
+        console.log("FOLDER CHECK ERROR:", checkError);
+        return res.status(500).send("Failed to check folder name");
+    }
+
+    if (existing && existing.length > 0) {
+        return res.status(400).send("A folder with that name already exists");
+    }
+
+    // Rename folder by updating all pastes inside it
+    const { error: updateError } = await supabase
+        .from("pastes")
+        .update({
+            folder: newName
+        })
+        .eq("folder", oldName);
+
+    if (updateError) {
+        console.log("FOLDER RENAME ERROR:", updateError);
+        return res.status(500).send("Failed to rename folder");
+    }
+
+    res.redirect("/");
+});
+
 // Create Page
 app.get("/create", (req, res) => {
     res.render("create");

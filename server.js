@@ -14,6 +14,8 @@ console.log(
 );
 
 const express = require("express");
+const session = require("express-session");
+const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
 const { nanoid } = require("nanoid");
@@ -24,7 +26,15 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(session({
+    secret: process.env.SESSION_SECRET || "pastehub-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    }
+}));
 app.use(express.static("public"));
 
 app.set("view engine", "ejs");

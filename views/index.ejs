@@ -12,114 +12,250 @@
 
 <div class="container">
 
-<h1>PasteHub</h1>
+    <!-- HEADER -->
+    <header class="home-header">
 
-<div class="top-buttons">
+        <div>
+            <h1>PasteHub</h1>
+            <p class="subtitle">
+                Your simple paste manager
+            </p>
+        </div>
 
-<a href="/create">
-<button>➕ Create New Paste</button>
-</a>
-
-<a href="/folder/add">
-<button>📁 Add Folder</button>
-</a>
-
-</div>
+    </header>
 
 
-<!-- FOLDERS -->
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
 
-<h2>📁 Folders</h2>
+        <a href="/create" class="action-card">
+            <span class="action-icon">＋</span>
 
-<% if (!folders || folders.length === 0) { %>
-
-<p>No folders yet.</p>
-
-<% } %>
-
-
-<% (folders || []).forEach(folder => { %>
-
-<div class="folder-box">
-
-    <h3>
-        📁
-        <a href="/folder/<%= encodeURIComponent(folder.name) %>">
-            <%= folder.name %>
+            <div>
+                <strong>New Paste</strong>
+                <small>Create a new paste</small>
+            </div>
         </a>
-    </h3>
-
-    <a href="/folder/rename/<%= encodeURIComponent(folder.name) %>">
-        <button>✏️ Rename</button>
-    </a>
-
-    <%
-    const folderPastes = pastes.filter(
-        paste => paste.folder === folder.name
-    );
-    %>
-
-    <p>
-        <%= folderPastes.length %>
-        paste<%= folderPastes.length === 1 ? "" : "s" %>
-    </p>
-
-</div>
-
-<br>
-
-<% }) %>
 
 
-<!-- OTHER PASTES -->
+        <a href="/folder/add" class="action-card">
+            <span class="action-icon">📁</span>
 
-<h2>📦 Other Pastes</h2>
-
-<%
-const noFolderPastes = (pastes || []).filter(
-    paste => !paste.folder || paste.folder === "None"
-);
-%>
-
-
-<% if (noFolderPastes.length === 0) { %>
-
-<p>No standalone pastes.</p>
-
-<% } %>
-
-
-<% noFolderPastes.forEach(paste => { %>
-
-<div class="paste-box">
-
-    <h3>
-        <a href="/paste/<%= paste.id %>">
-            <%= paste.title %>
+            <div>
+                <strong>New Folder</strong>
+                <small>Organize your pastes</small>
+            </div>
         </a>
-    </h3>
 
-    <p>
-        👁️ Views: <%= paste.views %>
-    </p>
+    </div>
 
-    <p>
-        📅 <%= new Date(paste.created).toLocaleString() %>
-    </p>
 
-    <a href="/edit/<%= paste.id %>?key=<%= paste.editKey %>">
-        <button>✏️ Edit</button>
-    </a>
+    <!-- FOLDERS -->
+    <section class="home-section">
 
-    <a href="/paste/move/<%= paste.id %>">
-        <button>📁 Move</button>
-    </a>
+        <div class="section-header">
 
-</div>
+            <div>
+                <h2>📁 Folders</h2>
+                <p>Organize your pastes into folders</p>
+            </div>
 
-<br>
+        </div>
 
-<% }) %>
+
+        <% if (!folders || folders.length === 0) { %>
+
+            <div class="empty-state">
+
+                <div class="empty-icon">📁</div>
+
+                <strong>No folders yet</strong>
+
+                <p>
+                    Create a folder to start organizing your pastes.
+                </p>
+
+                <a href="/folder/add">
+                    <button>＋ Create Folder</button>
+                </a>
+
+            </div>
+
+        <% } else { %>
+
+
+            <div class="folder-grid">
+
+                <% folders.forEach(folder => { %>
+
+                    <%
+                    const folderPastes = (pastes || []).filter(
+                        paste => paste.folder === folder.name
+                    );
+                    %>
+
+
+                    <div class="folder-card">
+
+                        <a
+                            class="folder-main"
+                            href="/folder/<%= encodeURIComponent(folder.name) %>"
+                        >
+
+                            <div class="folder-icon">
+                                📁
+                            </div>
+
+                            <div class="folder-info">
+
+                                <strong>
+                                    <%= folder.name %>
+                                </strong>
+
+                                <span>
+                                    <%= folderPastes.length %>
+                                    paste<%= folderPastes.length === 1 ? "" : "s" %>
+                                </span>
+
+                            </div>
+
+                            <div class="folder-arrow">
+                                →
+                            </div>
+
+                        </a>
+
+
+                        <div class="folder-actions">
+
+                            <a
+                                href="/folder/rename/<%= encodeURIComponent(folder.name) %>"
+                            >
+                                <button>
+                                    ✏️ Rename
+                                </button>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                <% }) %>
+
+            </div>
+
+
+        <% } %>
+
+    </section>
+
+
+    <!-- OTHER PASTES -->
+    <section class="home-section">
+
+        <div class="section-header">
+
+            <div>
+                <h2>📦 Other Pastes</h2>
+                <p>Pastes that aren't inside a folder</p>
+            </div>
+
+        </div>
+
+
+        <%
+        const noFolderPastes = (pastes || []).filter(
+            paste => !paste.folder || paste.folder === "None"
+        );
+        %>
+
+
+        <% if (noFolderPastes.length === 0) { %>
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📄
+                </div>
+
+                <strong>
+                    No standalone pastes
+                </strong>
+
+                <p>
+                    Create a paste without selecting a folder.
+                </p>
+
+            </div>
+
+
+        <% } else { %>
+
+
+            <div class="paste-list">
+
+                <% noFolderPastes.forEach(paste => { %>
+
+                    <div class="paste-card">
+
+                        <div class="paste-main">
+
+                            <a
+                                href="/paste/<%= paste.id %>"
+                                class="paste-title"
+                            >
+                                <%= paste.title %>
+                            </a>
+
+
+                            <div class="paste-meta">
+
+                                <span>
+                                    👁️ <%= paste.views %> views
+                                </span>
+
+                                <span>
+                                    📅
+                                    <%= new Date(paste.created).toLocaleString() %>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="paste-actions">
+
+                            <a
+                                href="/edit/<%= paste.id %>?key=<%= paste.editKey %>"
+                            >
+                                <button>
+                                    ✏️ Edit
+                                </button>
+                            </a>
+
+
+                            <a
+                                href="/paste/move/<%= paste.id %>"
+                            >
+                                <button>
+                                    📁 Move
+                                </button>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                <% }) %>
+
+            </div>
+
+
+        <% } %>
+
+    </section>
 
 
 </div>

@@ -14,42 +14,59 @@
 
 <h1>PasteHub</h1>
 
+<div class="top-buttons">
+
 <a href="/create">
-<button>Create New Paste</button>
+<button>➕ Create New Paste</button>
 </a>
 
-<h2>Saved Pastes</h2>
+<a href="/folder/add">
+<button>📁 Add Folder</button>
+</a>
 
-<% if (pastes.length === 0) { %>
+</div>
 
-<p>No pastes yet.</p>
+<h2>Folders</h2>
+
+<%
+const folderMap = {};
+
+pastes.forEach(paste => {
+
+    const folder = paste.folder || "Uncategorized";
+
+    if (!folderMap[folder]) {
+        folderMap[folder] = [];
+    }
+
+    folderMap[folder].push(paste);
+
+});
+%>
+
+
+<% if (Object.keys(folderMap).length === 0) { %>
+
+<p>No folders yet.</p>
 
 <% } %>
 
 
-<% pastes.forEach(paste => { %>
+<% Object.keys(folderMap).forEach(folder => { %>
 
-<div class="paste-box">
+<div class="folder-box">
 
-<h3>
-<a href="/paste/<%= paste.id %>">
-<%= paste.title %>
-</a>
-</h3>
+    <h3>
+        📁
+        <a href="/folder/<%= encodeURIComponent(folder) %>">
+            <%= folder %>
+        </a>
+    </h3>
 
-<p>
-👁️ Views: <%= paste.views %>
-</p>
-
-<p>
-📅 <%= new Date(paste.created).toLocaleString() %>
-</p>
-
-<a href="/edit/<%= paste.id %>?key=<%= paste.editKey %>">
-<button>
-✏️ Edit
-</button>
-</a>
+    <p>
+        <%= folderMap[folder].length %>
+        paste<%= folderMap[folder].length === 1 ? "" : "s" %>
+    </p>
 
 </div>
 

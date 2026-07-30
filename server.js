@@ -1019,6 +1019,40 @@ app.post("/register", async (req, res) => {
     res.redirect("/login");
 });
 
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.post("/login", async (req, res) => {
+
+    const username = (req.body.username || "").trim();
+    const password = req.body.password || "";
+
+    const { data: user, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("username", username)
+        .single();
+
+    if (error || !user) {
+        return res.status(400).send("Invalid username or password");
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+        return res.status(400).send("Invalid username or password");
+    }
+
+    req.session.user = {
+        id: user.id,
+        username: user.username
+    };
+
+    res.redirect("/");
+});
+
 /* =========================================================
    404
 ========================================================= */

@@ -17,19 +17,42 @@
     <!-- HEADER -->
     <header class="home-header">
 
-        <h1>PasteHub</h1>
+    <div class="header-menu">
 
-        <p class="subtitle">
-            Your simple paste manager
-        </p>
+        <button
+            class="menu-button"
+            onclick="toggleTopMenu(event)"
+        >
+            ⋮
+        </button>
 
-    </header>
+        <div
+            id="topMenu"
+            class="menu-dropdown"
+        >
 
-<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
-    <a href="/logout">
-        <button class="logout-btn">🔴 Logout</button>
-    </a>
-</div>
+            <a
+                href="https://t.me/KAZEHAYAMODZ"
+                target="_blank"
+            >
+                💬 Contact Developer
+            </a>
+
+            <a href="/logout">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </div>
+
+    <h1>PasteHub</h1>
+
+    <p class="subtitle">
+        Your simple paste manager
+    </p>
+
+</header>
 
 
     <!-- QUICK ACTIONS -->
@@ -290,13 +313,32 @@
 
 <script>
 
+function toggleTopMenu(event){
+
+    event.stopPropagation();
+
+    // Isara muna lahat ng card menus
+    document.querySelectorAll(".card-menu .menu-dropdown").forEach(function(menu){
+        menu.classList.remove("show");
+    });
+
+    document
+        .getElementById("topMenu")
+        .classList.toggle("show");
+
+}
+
 function toggleMenu(button) {
+
+    document
+        .getElementById("topMenu")
+        ?.classList.remove("show");
 
     const menu = button.nextElementSibling;
 
-    document.querySelectorAll(".menu-dropdown").forEach(function(item) {
+    document.querySelectorAll(".card-menu .menu-dropdown").forEach(function(item){
 
-        if (item !== menu) {
+        if(item !== menu){
             item.classList.remove("show");
         }
 
@@ -306,8 +348,11 @@ function toggleMenu(button) {
 
 }
 
-
 document.addEventListener("click", function(event) {
+
+    document
+        .getElementById("topMenu")
+        ?.classList.remove("show");
 
     if (!event.target.closest(".card-menu")) {
 

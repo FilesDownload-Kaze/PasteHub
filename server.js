@@ -195,8 +195,31 @@ app.post("/folder/rename", async (req, res) => {
 });
 
 // Create Page
-app.get("/create", (req, res) => {
-    res.render("create");
+// Create Page
+app.get("/create", async (req, res) => {
+
+    const { data: pastes, error } = await supabase
+        .from("pastes")
+        .select("folder");
+
+    if (error) {
+        console.log("LOAD FOLDERS ERROR:", error);
+        return res.status(500).send("Failed to load folders");
+    }
+
+    const folders = [
+        ...new Set(
+            (pastes || [])
+                .map(paste => paste.folder)
+                .filter(folder => folder && folder.trim() !== "")
+        )
+    ];
+
+    res.render("create", {
+        folders,
+        selectedFolder: req.query.folder || ""
+    });
+
 });
 
 // Create Paste

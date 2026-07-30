@@ -8,12 +8,16 @@ const supabase = createClient(
 );
 
 console.log("Supabase URL:", process.env.SUPABASE_URL);
-console.log("Supabase Key:", process.env.SUPABASE_KEY ? "Loaded" : "Missing");
+console.log(
+    "Supabase Key:",
+    process.env.SUPABASE_KEY ? "Loaded" : "Missing"
+);
 
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const { nanoid } = require("nanoid");
+const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,13 +44,15 @@ function savePastes(data) {
     fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 }
 
-const crypto = require("crypto");
-
 function generateEditKey() {
     return crypto.randomBytes(16).toString("hex");
 }
 
-// Home
+
+/* =========================================================
+   HOME
+========================================================= */
+
 app.get("/", async (req, res) => {
 
     const { data: pastes, error } = await supabase
@@ -55,17 +61,31 @@ app.get("/", async (req, res) => {
         .order("created", { ascending: false });
 
     if (error) {
-        console.log(error);
+        console.log("HOME ERROR:", error);
         return res.status(500).send("Failed to load pastes");
     }
 
-    res.render("index", {
-        pastes
-    });
+    const { data: folders, error: folderError } = await supabase
+        .from("folders")
+        .select("*")
+        .order("created", { ascending: true });
 
+    if (folderError) {
+        console.log("FOLDERS ERROR:", folderError);
+        return res.status(500).send("Failed to load folders");
+    }
+
+    res.render("index", {
+        pastes: pastes || [],
+        folders: folders || []
+    });
 });
 
-// All Pastes
+
+/* =========================================================
+   ALL PASTES
+========================================================= */
+
 app.get("/all-pastes", async (req, res) => {
 
     const { data: pastes, error } = await supabase
@@ -79,12 +99,117 @@ app.get("/all-pastes", async (req, res) => {
     }
 
     res.render("all-pastes", {
-        pastes
+        pastes: pastes || []
     });
-
 });
 
-// Open Folder
+
+/* =========================================================
+   ADD FOLDER PAGE
+========================================================= */
+
+app.get("/folder/add", (req, res) => {
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Add Folder - PasteHub</title>
+
+<link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📁 Create Folder</h1>
+
+<form method="POST" action="/folder/add">
+
+<input
+    type="text"
+    name="name"
+    placeholder="Folder name"
+    required
+>
+
+<br><br>
+
+<button type="submit">
+📁 Create Folder
+</button>
+
+<a href="/">
+<button type="button">
+Cancel
+</button>
+</a>
+
+</form>
+
+</div>
+
+</body>
+</html>
+    `);
+});
+
+
+/* =========================================================
+   ADD FOLDER SAVE
+========================================================= */
+
+app.post("/folder/add", async (req, res) => {
+
+    const name = (req.body.name || "").trim();
+
+    if (!name) {
+        return res.status(400).send("Folder name is required");
+    }
+
+    /* Check duplicate folder */
+
+    const { data: existing, error: checkError } = await supabase
+        .from("folders")
+        .select("id")
+        .eq("name", name)
+        .limit(1);
+
+    if (checkError) {
+        console.log("FOLDER CHECK ERROR:", checkError);
+        return res.status(500).send("Failed to check folder");
+    }
+
+    if (existing && existing.length > 0) {
+        return res.status(400).send("A folder with that name already exists");
+    }
+
+    /* Create folder */
+
+    const { error: insertError } = await supabase
+        .from("folders")
+        .insert({
+            id: nanoid(8),
+            name: name,
+            created: new Date().toISOString()
+        });
+
+    if (insertError) {
+        console.log("FOLDER INSERT ERROR:", insertError);
+        return res.status(500).send("Failed to create folder");
+    }
+
+    res.redirect("/");
+});
+
+
+/* =========================================================
+   OPEN FOLDER
+========================================================= */
+
 app.get("/folder/:name", async (req, res) => {
 
     const folderName = decodeURIComponent(req.params.name);
@@ -102,12 +227,15 @@ app.get("/folder/:name", async (req, res) => {
 
     res.render("folder", {
         folder: folderName,
-        pastes
+        pastes: pastes || []
     });
-
 });
 
-// Rename Folder
+
+/* =========================================================
+   RENAME FOLDER PAGE
+========================================================= */
+
 app.get("/folder/rename/:name", (req, res) => {
 
     const folderName = decodeURIComponent(req.params.name);
@@ -167,7 +295,10 @@ Cancel
 });
 
 
-// Save Renamed Folder
+/* =========================================================
+   RENAME FOLDER SAVE
+========================================================= */
+
 app.post("/folder/rename", async (req, res) => {
 
     const oldName = (req.body.oldName || "").trim();
@@ -181,11 +312,12 @@ app.post("/folder/rename", async (req, res) => {
         return res.redirect("/");
     }
 
-    // Check if new folder name already exists
+    /* Check if new folder already exists */
+
     const { data: existing, error: checkError } = await supabase
-        .from("pastes")
+        .from("folders")
         .select("id")
-        .eq("folder", newName)
+        .eq("name", newName)
         .limit(1);
 
     if (checkError) {
@@ -197,69 +329,120 @@ app.post("/folder/rename", async (req, res) => {
         return res.status(400).send("A folder with that name already exists");
     }
 
-    // Rename folder by updating all pastes inside it
-    const { error: updateError } = await supabase
+    /* Rename actual folder */
+
+    const { error: folderUpdateError } = await supabase
+        .from("folders")
+        .update({
+            name: newName
+        })
+        .eq("name", oldName);
+
+    if (folderUpdateError) {
+        console.log("FOLDER RENAME ERROR:", folderUpdateError);
+        return res.status(500).send("Failed to rename folder");
+    }
+
+    /* Update pastes inside that folder */
+
+    const { error: pasteUpdateError } = await supabase
         .from("pastes")
         .update({
             folder: newName
         })
         .eq("folder", oldName);
 
-    if (updateError) {
-        console.log("FOLDER RENAME ERROR:", updateError);
-        return res.status(500).send("Failed to rename folder");
+    if (pasteUpdateError) {
+        console.log("PASTE FOLDER UPDATE ERROR:", pasteUpdateError);
+        return res.status(500).send(
+            "Folder renamed but failed to update pastes"
+        );
     }
 
     res.redirect("/");
 });
 
-// Create Page
-// Create Page
+
+/* =========================================================
+   CREATE PAGE
+========================================================= */
+
 app.get("/create", async (req, res) => {
 
-    const { data: pastes, error } = await supabase
-        .from("pastes")
-        .select("folder");
+    const { data: folders, error } = await supabase
+        .from("folders")
+        .select("*")
+        .order("created", { ascending: true });
 
     if (error) {
         console.log("LOAD FOLDERS ERROR:", error);
         return res.status(500).send("Failed to load folders");
     }
 
-    const folders = [
-        ...new Set(
-            (pastes || [])
-                .map(paste => paste.folder)
-                .filter(folder => folder && folder.trim() !== "")
-        )
-    ];
-
     res.render("create", {
-        folders,
+        folders: folders || [],
         selectedFolder: req.query.folder || ""
     });
-
 });
 
-// Create Paste
+
+/* =========================================================
+   CREATE PASTE
+========================================================= */
+
 app.post("/create", async (req, res) => {
 
     const id = nanoid(8);
     const now = new Date().toISOString();
 
+    const title = req.body.title || "Untitled";
+    const content = req.body.content || "";
+
+    let folder = (req.body.folder || "").trim();
+
+    /*
+        Empty folder = no folder
+    */
+
+    if (folder === "") {
+        folder = null;
+    } else {
+
+        /*
+            Make sure selected folder really exists
+        */
+
+        const { data: folderExists, error: folderCheckError } =
+            await supabase
+                .from("folders")
+                .select("id")
+                .eq("name", folder)
+                .limit(1);
+
+        if (folderCheckError) {
+            console.log("CREATE FOLDER CHECK ERROR:", folderCheckError);
+            return res.status(500).send("Failed to check folder");
+        }
+
+        if (!folderExists || folderExists.length === 0) {
+            return res.status(400).send("Selected folder does not exist");
+        }
+    }
+
     const pasteData = {
         id,
-        title: req.body.title || "Untitled",
-        content: req.body.content || "",
-        folder: req.body.folder || null,
+        title,
+        content,
+        folder,
         created: now,
         updated: now,
         views: 0,
         editKey: generateEditKey(),
+
         history: [
             {
-                title: req.body.title || "Untitled",
-                content: req.body.content || "",
+                title,
+                content,
                 editedAt: now
             }
         ]
@@ -275,33 +458,39 @@ app.post("/create", async (req, res) => {
     }
 
     res.redirect("/paste/" + id);
-
 });
 
-// View Paste
+
+/* =========================================================
+   VIEW PASTE
+========================================================= */
+
 app.get("/paste/:id", async (req, res) => {
 
     const { data: paste, error } = await supabase
-    .from("pastes")
-    .select("*")
-    .eq("id", req.params.id)
-    .single();
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
 
-if (error || !paste) {
-    return res.status(404).send("Paste not found");
-}
+    if (error || !paste) {
+        return res.status(404).send("Paste not found");
+    }
 
-paste.views++;
+    paste.views++;
 
-await supabase
-    .from("pastes")
-    .update({ views: paste.views })
-    .eq("id", paste.id);
-    
+    await supabase
+        .from("pastes")
+        .update({
+            views: paste.views
+        })
+        .eq("id", paste.id);
+
     res.send(`
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>${paste.title}</title>
 
 <link rel="stylesheet" href="/style.css">
@@ -316,9 +505,20 @@ await supabase
 
 <p>👁️ Views: ${paste.views}</p>
 
-<p>📅 Created: ${new Date(paste.created).toLocaleString()}</p>
+<p>
+📁 Folder:
+${paste.folder || "None"}
+</p>
 
-<p>✏️ Last Edited: ${new Date(paste.updated).toLocaleString()}</p>
+<p>
+📅 Created:
+${new Date(paste.created).toLocaleString()}
+</p>
+
+<p>
+✏️ Last Edited:
+${new Date(paste.updated).toLocaleString()}
+</p>
 
 <textarea readonly>${paste.content}</textarea>
 
@@ -336,8 +536,17 @@ await supabase
 
 <br><br>
 
-<form method="POST" action="/delete/${paste.id}?key=${paste.editKey}"
-onsubmit="return confirm('Delete this paste?');">
+<a href="/paste/move/${paste.id}">
+<button>📁 Move Paste</button>
+</a>
+
+<br><br>
+
+<form
+method="POST"
+action="/delete/${paste.id}?key=${paste.editKey}"
+onsubmit="return confirm('Delete this paste?');"
+>
 
 <button style="background:red;color:white;">
 🗑️ Delete Paste
@@ -345,16 +554,24 @@ onsubmit="return confirm('Delete this paste?');">
 
 </form>
 
+<br>
+
+<a href="/">
+<button>← Back</button>
+</a>
+
 </div>
 
 </body>
-
 </html>
     `);
-
 });
 
-// Raw
+
+/* =========================================================
+   RAW
+========================================================= */
+
 app.get("/raw/:id", async (req, res) => {
 
     const { data: paste, error } = await supabase
@@ -369,10 +586,13 @@ app.get("/raw/:id", async (req, res) => {
 
     res.type("text/plain");
     res.send(paste.content);
-
 });
 
-// Download Redirect
+
+/* =========================================================
+   DOWNLOAD REDIRECT
+========================================================= */
+
 app.get("/download/:id", async (req, res) => {
 
     const { data: paste, error } = await supabase
@@ -386,10 +606,13 @@ app.get("/download/:id", async (req, res) => {
     }
 
     res.redirect(paste.content.trim());
-
 });
 
-// Edit Page
+
+/* =========================================================
+   EDIT PAGE
+========================================================= */
+
 app.get("/edit/:id", async (req, res) => {
 
     const { data: paste, error } = await supabase
@@ -409,15 +632,20 @@ app.get("/edit/:id", async (req, res) => {
     res.send(`
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <title>Edit Paste</title>
+
 <link rel="stylesheet" href="/style.css">
+
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>Edit Paste</h1>
+<h1>✏️ Edit Paste</h1>
 
 <form method="POST" action="/edit/${paste.id}?key=${paste.editKey}">
 
@@ -435,19 +663,31 @@ rows="15"
 
 <br><br>
 
-<button type="submit">💾 Save Changes</button>
+<button type="submit">
+💾 Save Changes
+</button>
 
 </form>
+
+<br>
+
+<a href="/paste/${paste.id}">
+<button>Cancel</button>
+</a>
 
 </div>
 
 </body>
+
 </html>
     `);
-
 });
 
-// Save Edit
+
+/* =========================================================
+   SAVE EDIT
+========================================================= */
+
 app.post("/edit/:id", async (req, res) => {
 
     const { data: paste, error } = await supabase
@@ -464,80 +704,43 @@ app.post("/edit/:id", async (req, res) => {
         return res.status(403).send("Invalid edit key");
     }
 
-    paste.history.push({
+    const history = Array.isArray(paste.history)
+        ? paste.history
+        : [];
+
+    history.push({
         title: paste.title,
         content: paste.content,
         editedAt: new Date().toISOString()
     });
 
-    paste.title = req.body.title || "Untitled";
-paste.content = req.body.content;
-paste.updated = new Date().toISOString();
+    const title = req.body.title || "Untitled";
+    const content = req.body.content || "";
+    const updated = new Date().toISOString();
 
-const { error: updateError } = await supabase
-    .from("pastes")
-    .update({
-        title: paste.title,
-        content: paste.content,
-        updated: paste.updated,
-        history: paste.history
-    })
-    .eq("id", paste.id);
-
-if (updateError) {
-    console.log(updateError);
-    return res.status(500).send("Failed to update paste");
-}
-
-res.redirect("/paste/" + paste.id);
-
-});
-
-app.get("/test-supabase", async (req, res) => {
-
-    const { data, error } = await supabase
+    const { error: updateError } = await supabase
         .from("pastes")
-        .select("*");
-
-    if (error) {
-        return res.send(error.message);
-    }
-
-    res.json(data);
-
-});
-
-// Delete Paste
-app.post("/delete/:id", async (req, res) => {
-
-    const { data: paste, error } = await supabase
-        .from("pastes")
-        .select("*")
-        .eq("id", req.params.id)
-        .single();
-
-    if (error || !paste) {
-        return res.status(404).send("Paste not found");
-    }
-
-    if (req.query.key !== paste.editKey) {
-        return res.status(403).send("Invalid edit key");
-    }
-
-    const { error: deleteError } = await supabase
-        .from("pastes")
-        .delete()
+        .update({
+            title,
+            content,
+            updated,
+            history
+        })
         .eq("id", paste.id);
 
-    if (deleteError) {
-        console.log(deleteError);
-        return res.status(500).send("Failed to delete paste");
+    if (updateError) {
+        console.log("EDIT ERROR:", updateError);
+        return res.status(500).send("Failed to update paste");
     }
 
-    res.redirect("/");
+    res.redirect("/paste/" + paste.id);
 });
 
-// Move Paste - Page
+
+/* =========================================================
+   MOVE PASTE - PAGE
+========================================================= */
+
 app.get("/paste/move/:id", async (req, res) => {
 
     const { data: paste, error: pasteError } = await supabase
@@ -550,27 +753,26 @@ app.get("/paste/move/:id", async (req, res) => {
         return res.status(404).send("Paste not found");
     }
 
+    /*
+        IMPORTANT:
+        Get folders from the folders table,
+        NOT from pastes.
+    */
+
     const { data: folders, error: folderError } = await supabase
-        .from("pastes")
-        .select("folder")
-        .not("folder", "is", null);
+        .from("folders")
+        .select("*")
+        .order("created", { ascending: true });
 
     if (folderError) {
         console.log("MOVE FOLDER ERROR:", folderError);
         return res.status(500).send("Failed to load folders");
     }
 
-    const uniqueFolders = [
-        ...new Set(
-            folders
-                .map(item => item.folder)
-                .filter(folder => folder && folder !== "None")
-        )
-    ];
-
     res.send(`
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <title>Move Paste - PasteHub</title>
@@ -587,21 +789,33 @@ app.get("/paste/move/:id", async (req, res) => {
 
 <h2>${paste.title}</h2>
 
+<p>
+Current Folder:
+<strong>${paste.folder || "None"}</strong>
+</p>
+
 <form method="POST" action="/paste/move/${paste.id}">
 
-<label>Select Folder:</label>
+<label>
+Select Folder:
+</label>
 
 <br><br>
 
 <select name="folder">
 
-    <option value="">None</option>
+<option value="">
+None
+</option>
 
-    ${uniqueFolders.map(folder => `
-        <option value="${folder}">
-            ${folder}
-        </option>
-    `).join("")}
+${(folders || []).map(folder => `
+<option
+value="${folder.name}"
+${paste.folder === folder.name ? "selected" : ""}
+>
+${folder.name}
+</option>
+`).join("")}
 
 </select>
 
@@ -615,24 +829,54 @@ app.get("/paste/move/:id", async (req, res) => {
 
 <br>
 
-<a href="/">
-    <button>← Back</button>
+<a href="/paste/${paste.id}">
+<button>
+← Back
+</button>
 </a>
 
 </div>
 
 </body>
+
 </html>
     `);
 });
 
 
-// Move Paste - Save
+/* =========================================================
+   MOVE PASTE - SAVE
+========================================================= */
+
 app.post("/paste/move/:id", async (req, res) => {
 
     const folder = (req.body.folder || "").trim();
 
     const newFolder = folder === "" ? null : folder;
+
+    /*
+        If selecting a folder,
+        make sure it exists.
+    */
+
+    if (newFolder !== null) {
+
+        const { data: folderExists, error: folderError } =
+            await supabase
+                .from("folders")
+                .select("id")
+                .eq("name", newFolder)
+                .limit(1);
+
+        if (folderError) {
+            console.log("MOVE CHECK ERROR:", folderError);
+            return res.status(500).send("Failed to check folder");
+        }
+
+        if (!folderExists || folderExists.length === 0) {
+            return res.status(400).send("Folder does not exist");
+        }
+    }
 
     const { data: paste, error: pasteError } = await supabase
         .from("pastes")
@@ -659,13 +903,72 @@ app.post("/paste/move/:id", async (req, res) => {
     res.redirect("/");
 });
 
-// 404 (PINAKA LAST)
+
+/* =========================================================
+   TEST SUPABASE
+========================================================= */
+
+app.get("/test-supabase", async (req, res) => {
+
+    const { data, error } = await supabase
+        .from("pastes")
+        .select("*");
+
+    if (error) {
+        return res.send(error.message);
+    }
+
+    res.json(data);
+});
+
+
+/* =========================================================
+   DELETE PASTE
+========================================================= */
+
+app.post("/delete/:id", async (req, res) => {
+
+    const { data: paste, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .eq("id", req.params.id)
+        .single();
+
+    if (error || !paste) {
+        return res.status(404).send("Paste not found");
+    }
+
+    if (req.query.key !== paste.editKey) {
+        return res.status(403).send("Invalid edit key");
+    }
+
+    const { error: deleteError } = await supabase
+        .from("pastes")
+        .delete()
+        .eq("id", paste.id);
+
+    if (deleteError) {
+        console.log("DELETE ERROR:", deleteError);
+        return res.status(500).send("Failed to delete paste");
+    }
+
+    res.redirect("/");
+});
+
+
+/* =========================================================
+   404
+========================================================= */
+
 app.use((req, res) => {
     res.status(404).send("404 Not Found");
 });
 
 
+/* =========================================================
+   START SERVER
+========================================================= */
+
 app.listen(PORT, () => {
     console.log(`PasteHub running on port ${PORT}`);
 });
-    

@@ -65,6 +65,25 @@ app.get("/", async (req, res) => {
 
 });
 
+// All Pastes
+app.get("/all-pastes", async (req, res) => {
+
+    const { data: pastes, error } = await supabase
+        .from("pastes")
+        .select("*")
+        .order("created", { ascending: false });
+
+    if (error) {
+        console.log("ALL PASTES ERROR:", error);
+        return res.status(500).send("Failed to load pastes");
+    }
+
+    res.render("all-pastes", {
+        pastes
+    });
+
+});
+
 // Open Folder
 app.get("/folder/:name", async (req, res) => {
 

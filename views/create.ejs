@@ -1,34 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Create Paste</title>
+
+<title>Create Paste - PasteHub</title>
+
 <link rel="stylesheet" href="/style.css">
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>Create New Paste</h1>
+<h1>➕ Create New Paste</h1>
 
 <form method="POST" action="/create">
 
-<input 
+<input
 type="text"
 name="title"
 placeholder="Paste Title"
 >
-
-<br><br>
-
-<label for="folder">Folder</label>
-
-<select name="folder" id="folder">
-    <option value="Uncategorized">📁 Uncategorized</option>
-    <option value="ROSE">📁 ROSE</option>
-    <option value="INJECTOR">📁 INJECTOR</option>
-    <option value="SCRIPT">📁 SCRIPT</option>
-</select>
 
 <br><br>
 
@@ -40,11 +32,50 @@ placeholder="Paste your code/text here..."
 
 <br><br>
 
+<label for="folder">📁 Folder</label>
+
+<br>
+
+<select name="folder" id="folder">
+
+    <option value="">None</option>
+
+    <option value="__CREATE_FOLDER__">
+        ➕ Create folder
+    </option>
+
+    <% folders.forEach(folder => { %>
+
+        <option
+            value="<%= folder %>"
+            <%= selectedFolder === folder ? "selected" : "" %>
+        >
+            📁 <%= folder %>
+        </option>
+
+    <% }) %>
+
+</select>
+
+<br><br>
+
 <button type="submit">
-Create Paste
+💾 Create Paste
 </button>
 
 </form>
+
+<script>
+
+document.getElementById("folder").addEventListener("change", function() {
+
+    if (this.value === "__CREATE_FOLDER__") {
+        window.location.href = "/folder/add";
+    }
+
+});
+
+</script>
 
 </div>
 

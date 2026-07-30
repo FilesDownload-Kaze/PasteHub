@@ -331,3 +331,77 @@
     }
 
 }
+
+/* =========================
+   PASTEHUB DARK THEME
+========================= */
+
+html,
+body {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.container {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+}
+
+h1,
+h2,
+h3,
+strong {
+    color: #f8fafc;
+}
+
+.subtitle,
+.section-header p,
+.empty-state p {
+    color: #94a3b8;
+}
+
+.folder-card,
+.paste-card,
+.action-card,
+.empty-state {
+    background: #263449 !important;
+    border-color: #334155 !important;
+}
+
+.folder-card:hover,
+.paste-card:hover,
+.action-card:hover {
+    background: #2d3c52 !important;
+}
+
+.folder-info strong,
+.paste-title,
+a {
+    color: #60a5fa;
+}
+
+.menu-dropdown {
+    background: #172235 !important;
+    border-color: #3b4a60 !important;
+}
+
+.menu-dropdown a {
+    color: #e5e7eb;
+}
+
+.menu-dropdown a:hover {
+    background: #263449;
+}
+
+.menu-button {
+    color: #94a3b8;
+}
+
+.menu-button:hover {
+    background: #334155;
+    color: #fff;
+}

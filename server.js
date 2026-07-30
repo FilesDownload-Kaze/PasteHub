@@ -84,6 +84,7 @@ app.get("/", async (req, res) => {
     const { data: folders, error: folderError } = await supabase
         .from("folders")
         .select("*")
+        .eq("userId", req.session.user.id)
         .order("created", { ascending: true });
 
     if (folderError) {
@@ -449,7 +450,7 @@ app.post("/create", async (req, res) => {
 
     const pasteData = {
         id,
-        userld: req.session.user.id, // <-- ADD THIS
+        userId: req.session.user.id,
         title,
         content,
         folder,
@@ -1096,6 +1097,38 @@ app.get("/setup-admin", async (req, res) => {
     }
 
     res.send("✅ Admin account created! Username: KAZEHAYAMODZ Password: Kaze82809353");
+});
+
+app.get("/debug-my-account", async (req, res) => {
+    if (!req.session.user) {
+        return res.send("Not logged in");
+    }
+
+    const { data: user, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", req.session.user.id)
+        .single();
+
+    const { data: pastes, error: pasteError } = await supabase
+        .from("pastes")
+        .select("id, title, userId, folder");
+
+    const { data: folders, error: folderError } = await supabase
+        .from("folders")
+        .select("id, name, userId");
+
+    res.json({
+        session: req.session.user,
+        user,
+        pastes,
+        folders,
+        errors: {
+            userError,
+            pasteError,
+            folderError
+        }
+    });
 });
 
 /* =========================================================

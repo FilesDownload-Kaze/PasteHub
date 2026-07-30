@@ -4,13 +4,13 @@ const { createClient } = require("@supabase/supabase-js");
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
+    process.env.SUPABASE_ANON_KEY
 );
 
 console.log("Supabase URL:", process.env.SUPABASE_URL);
 console.log(
     "Supabase Key:",
-    process.env.SUPABASE_KEY ? "Loaded" : "Missing"
+    process.env.SUPABASE_ANON_KEY ? "Loaded" : "Missing"
 );
 
 const express = require("express");

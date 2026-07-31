@@ -605,7 +605,6 @@ app.get("/raw/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
-        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 

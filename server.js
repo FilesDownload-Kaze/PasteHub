@@ -193,6 +193,7 @@ app.post("/folder/add", async (req, res) => {
     const { data: existing, error: checkError } = await supabase
         .from("folders")
         .select("id")
+        .eq("userId", req.session.user.id)
         .eq("name", name)
         .limit(1);
 
@@ -355,6 +356,7 @@ app.post("/folder/rename", async (req, res) => {
         .update({
             name: newName
         })
+        .eq("userId", req.session.user.id)
         .eq("name", oldName);
 
     if (folderUpdateError) {
@@ -391,8 +393,9 @@ app.get("/create", async (req, res) => {
     const { data: folders, error } = await supabase
         .from("folders")
         .select("*")
+        .eq("userId", req.session.user.id)
         .order("created", { ascending: true });
-
+    
     if (error) {
         console.log("LOAD FOLDERS ERROR:", error);
         return res.status(500).send("Failed to load folders");
@@ -886,6 +889,7 @@ app.post("/paste/move/:id", async (req, res) => {
             await supabase
                 .from("folders")
                 .select("id")
+                .eq("userId", req.session.user.id)
                 .eq("name", newFolder)
                 .limit(1);
 

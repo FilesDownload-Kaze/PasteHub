@@ -1093,7 +1093,6 @@ app.get("/setup-admin", async (req, res) => {
     const { data: existing } = await supabase
         .from("users")
         .select("id")
-        .eq("userId", req.session.user.id)
         .eq("username", "KAZEHAYAMODZ")
         .limit(1);
 
@@ -1105,7 +1104,6 @@ app.get("/setup-admin", async (req, res) => {
 
     const { error } = await supabase
         .from("users")
-        .eq("userId", req.session.user.id)
         .insert({
             id: nanoid(8),
             username: "KAZEHAYAMODZ",

@@ -109,6 +109,7 @@ app.get("/all-pastes", async (req, res) => {
     const { data: pastes, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .order("created", { ascending: false });
 
     if (error) {
@@ -238,6 +239,7 @@ app.get("/folder/:name", async (req, res) => {
         .from("pastes")
         .select("*")
         .eq("folder", folderName)
+        .eq("userId", req.session.user.id)
         .order("created", { ascending: false });
 
     if (error) {
@@ -337,6 +339,7 @@ app.post("/folder/rename", async (req, res) => {
     const { data: existing, error: checkError } = await supabase
         .from("folders")
         .select("id")
+        .eq("userId", req.session.user.id)
         .eq("name", newName)
         .limit(1);
 
@@ -438,6 +441,7 @@ app.post("/create", async (req, res) => {
             await supabase
                 .from("folders")
                 .select("id")
+                .eq("userId", req.session.user.id)
                 .eq("name", folder)
                 .limit(1);
 
@@ -493,6 +497,7 @@ app.get("/paste/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -600,6 +605,7 @@ app.get("/raw/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -621,6 +627,7 @@ app.get("/download/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("content")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -641,6 +648,7 @@ app.get("/edit/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -716,6 +724,7 @@ app.post("/edit/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -742,14 +751,15 @@ app.post("/edit/:id", async (req, res) => {
     const updated = new Date().toISOString();
 
     const { error: updateError } = await supabase
-        .from("pastes")
-        .update({
-            title,
-            content,
-            updated,
-            history
-        })
-        .eq("id", paste.id);
+    .from("pastes")
+    .update({
+        title,
+        content,
+        updated,
+        history
+    })
+    .eq("userId", req.session.user.id)
+    .eq("id", paste.id);
 
     if (updateError) {
         console.log("EDIT ERROR:", updateError);
@@ -769,6 +779,7 @@ app.get("/paste/move/:id", async (req, res) => {
     const { data: paste, error: pasteError } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -906,6 +917,7 @@ app.post("/paste/move/:id", async (req, res) => {
     const { data: paste, error: pasteError } = await supabase
         .from("pastes")
         .select("id")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -915,10 +927,11 @@ app.post("/paste/move/:id", async (req, res) => {
 
     const { error: updateError } = await supabase
         .from("pastes")
-        .update({
-            folder: newFolder
-        })
-        .eq("id", req.params.id);
+.update({
+    folder: newFolder
+})
+.eq("userId", req.session.user.id)
+.eq("id", req.params.id);
 
     if (updateError) {
         console.log("MOVE PASTE ERROR:", updateError);
@@ -937,6 +950,7 @@ app.get("/test-supabase", async (req, res) => {
 
     const { data, error } = await supabase
         .from("pastes")
+        .eq("userId", req.session.user.id)
         .select("*");
 
     if (error) {
@@ -956,6 +970,7 @@ app.post("/delete/:id", async (req, res) => {
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("*")
+        .eq("userId", req.session.user.id)
         .eq("id", req.params.id)
         .single();
 
@@ -968,9 +983,10 @@ app.post("/delete/:id", async (req, res) => {
     }
 
     const { error: deleteError } = await supabase
-        .from("pastes")
-        .delete()
-        .eq("id", paste.id);
+    .from("pastes")
+    .delete()
+    .eq("userId", req.session.user.id)
+    .eq("id", paste.id);
 
     if (deleteError) {
         console.log("DELETE ERROR:", deleteError);
@@ -1002,10 +1018,10 @@ app.post("/register", async (req, res) => {
     }
 
     const { data: existing, error: checkError } = await supabase
-        .from("users")
-        .select("id")
-        .eq("username", username)
-        .limit(1);
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .limit(1);
 
     if (checkError) {
         console.log(checkError);
@@ -1019,12 +1035,12 @@ app.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const { error: insertError } = await supabase
-        .from("users")
-        .insert({
-            id: nanoid(8),
-            username: username,
-            password: hashedPassword
-        });
+    .from("users")
+    .insert({
+        id: nanoid(8),
+        username: username,
+        password: hashedPassword
+    });
 
     if (insertError) {
     console.log("REGISTER ERROR:", insertError);
@@ -1077,6 +1093,7 @@ app.get("/setup-admin", async (req, res) => {
     const { data: existing } = await supabase
         .from("users")
         .select("id")
+        .eq("userId", req.session.user.id)
         .eq("username", "KAZEHAYAMODZ")
         .limit(1);
 
@@ -1088,6 +1105,7 @@ app.get("/setup-admin", async (req, res) => {
 
     const { error } = await supabase
         .from("users")
+        .eq("userId", req.session.user.id)
         .insert({
             id: nanoid(8),
             username: "KAZEHAYAMODZ",
@@ -1116,10 +1134,12 @@ app.get("/debug-my-account", async (req, res) => {
 
     const { data: pastes, error: pasteError } = await supabase
         .from("pastes")
+        .eq("userId", req.session.user.id)
         .select("id, title, userId, folder");
 
     const { data: folders, error: folderError } = await supabase
         .from("folders")
+        .eq("userId", req.session.user.id)
         .select("id, name, userId");
 
     res.json({
@@ -1146,6 +1166,7 @@ app.get("/restore-admin-data", async (req, res) => {
     // Link old folders to the logged-in account
     const { error: folderError } = await supabase
         .from("folders")
+        .eq("userId", req.session.user.id)
         .update({
             userId: userId
         })
@@ -1159,6 +1180,7 @@ app.get("/restore-admin-data", async (req, res) => {
     // Link old pastes to the logged-in account
     const { error: pasteError } = await supabase
         .from("pastes")
+        .eq("userId", req.session.user.id)
         .update({
             userId: userId
         })

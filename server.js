@@ -106,6 +106,11 @@ app.get("/", async (req, res) => {
 
 app.get("/all-pastes", async (req, res) => {
 
+    // Check if user is logged in
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
     const { data: pastes, error } = await supabase
         .from("pastes")
         .select("*")

@@ -628,6 +628,10 @@ app.get("/raw/:id", async (req, res) => {
 
 app.get("/download/:id", async (req, res) => {
 
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
     const { data: paste, error } = await supabase
         .from("pastes")
         .select("content")
@@ -641,7 +645,6 @@ app.get("/download/:id", async (req, res) => {
 
     res.redirect(paste.content.trim());
 });
-
 
 /* =========================================================
    EDIT PAGE
